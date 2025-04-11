@@ -36,7 +36,7 @@ vkBasalt_src = [
     'stb_image.c',
     'stb_image_resize.c',
     'util.cpp',
-    'vkdispatch.cpp',
+    # 'vkdispatch.cpp',
 ]
 
 reshadefx_src = [
