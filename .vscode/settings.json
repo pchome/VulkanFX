@@ -1,0 +1,13 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "*.json.in"
+      ],
+      "url": "./layers_schema.json"
+    }
+  ],
+  "files.associations": {
+    "*.json.in": "json"
+  }
+}
