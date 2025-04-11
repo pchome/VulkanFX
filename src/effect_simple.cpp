@@ -115,7 +115,7 @@ namespace vkBasalt
         secondBarrier.subresourceRange.baseArrayLayer = 0;
         secondBarrier.subresourceRange.layerCount     = 1;
 
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         Logger::debug("after the first pipeline barrier");
 
@@ -131,23 +131,23 @@ namespace vkBasalt
         renderPassBeginInfo.pClearValues      = &clearValue;
 
         Logger::debug("before beginn renderpass");
-        pLogicalDevice->vkd.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        pLogicalDevice->vkd->CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
         Logger::debug("after beginn renderpass");
 
-        pLogicalDevice->vkd.CmdBindDescriptorSets(
+        pLogicalDevice->vkd->CmdBindDescriptorSets(
             commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(imageDescriptorSets[imageIndex]), 0, nullptr);
         Logger::debug("after binding image sampler");
 
-        pLogicalDevice->vkd.CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+        pLogicalDevice->vkd->CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
         Logger::debug("after bind pipeliene");
 
-        pLogicalDevice->vkd.CmdDraw(commandBuffer, 3, 1, 0, 0);
+        pLogicalDevice->vkd->CmdDraw(commandBuffer, 3, 1, 0, 0);
         Logger::debug("after draw");
 
-        pLogicalDevice->vkd.CmdEndRenderPass(commandBuffer);
+        pLogicalDevice->vkd->CmdEndRenderPass(commandBuffer);
         Logger::debug("after end renderpass");
 
-        pLogicalDevice->vkd.CmdPipelineBarrier(commandBuffer,
+        pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffer,
                                                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                                0,
@@ -162,21 +162,21 @@ namespace vkBasalt
     SimpleEffect::~SimpleEffect()
     {
         Logger::debug("destroying SimpleEffect " + convertToString(this));
-        pLogicalDevice->vkd.DestroyPipeline(pLogicalDevice->device, graphicsPipeline, nullptr);
-        pLogicalDevice->vkd.DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
-        pLogicalDevice->vkd.DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
-        pLogicalDevice->vkd.DestroyDescriptorSetLayout(pLogicalDevice->device, imageSamplerDescriptorSetLayout, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, vertexModule, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, fragmentModule, nullptr);
+        pLogicalDevice->vkd->DestroyPipeline(pLogicalDevice->device, graphicsPipeline, nullptr);
+        pLogicalDevice->vkd->DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
+        pLogicalDevice->vkd->DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
+        pLogicalDevice->vkd->DestroyDescriptorSetLayout(pLogicalDevice->device, imageSamplerDescriptorSetLayout, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, vertexModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, fragmentModule, nullptr);
 
-        pLogicalDevice->vkd.DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
+        pLogicalDevice->vkd->DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
         for (unsigned int i = 0; i < framebuffers.size(); i++)
         {
-            pLogicalDevice->vkd.DestroyFramebuffer(pLogicalDevice->device, framebuffers[i], nullptr);
-            pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, inputImageViews[i], nullptr);
-            pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
+            pLogicalDevice->vkd->DestroyFramebuffer(pLogicalDevice->device, framebuffers[i], nullptr);
+            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, inputImageViews[i], nullptr);
+            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
         }
         Logger::debug("after DestroyImageView");
-        pLogicalDevice->vkd.DestroySampler(pLogicalDevice->device, sampler, nullptr);
+        pLogicalDevice->vkd->DestroySampler(pLogicalDevice->device, sampler, nullptr);
     }
 } // namespace vkBasalt

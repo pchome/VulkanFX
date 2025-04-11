@@ -25,7 +25,7 @@ namespace vkBasalt
             framebufferCreateInfo.height          = extent.height;
             framebufferCreateInfo.layers          = 1;
 
-            VkResult result = pLogicalDevice->vkd.CreateFramebuffer(pLogicalDevice->device, &framebufferCreateInfo, nullptr, &(framebuffers[i]));
+            VkResult result = pLogicalDevice->vkd->CreateFramebuffer(pLogicalDevice->device, &framebufferCreateInfo, nullptr, &(framebuffers[i]));
             ASSERT_VULKAN(result);
             perFrameImageViews.clear();
         }

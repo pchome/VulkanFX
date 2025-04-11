@@ -99,7 +99,7 @@ namespace vkBasalt
         for (auto& format : formats)
         {
             VkFormatProperties properties;
-            pLogicalDevice->vki.GetPhysicalDeviceFormatProperties(pLogicalDevice->physicalDevice, format, &properties);
+            pLogicalDevice->vki->GetPhysicalDeviceFormatProperties(pLogicalDevice->physicalDevice, format, &properties);
             if ((properties.optimalTilingFeatures & features) == features && tiling == VK_IMAGE_TILING_OPTIMAL)
             {
                 return format;

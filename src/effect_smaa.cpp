@@ -244,7 +244,7 @@ namespace vkBasalt
         secondBarrier.subresourceRange.baseArrayLayer = 0;
         secondBarrier.subresourceRange.layerCount     = 1;
 
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         Logger::debug("after the first pipeline barrier");
 
@@ -260,64 +260,64 @@ namespace vkBasalt
         renderPassBeginInfo.pClearValues      = &clearValue;
         // edge renderPass
         Logger::debug("before beginn edge renderpass");
-        pLogicalDevice->vkd.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        pLogicalDevice->vkd->CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
         Logger::debug("after beginn renderpass");
 
-        pLogicalDevice->vkd.CmdBindDescriptorSets(
+        pLogicalDevice->vkd->CmdBindDescriptorSets(
             commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(imageDescriptorSets[imageIndex]), 0, nullptr);
         Logger::debug("after binding image sampler");
 
-        pLogicalDevice->vkd.CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, edgePipeline);
+        pLogicalDevice->vkd->CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, edgePipeline);
         Logger::debug("after bind pipeliene");
 
-        pLogicalDevice->vkd.CmdDraw(commandBuffer, 3, 1, 0, 0);
+        pLogicalDevice->vkd->CmdDraw(commandBuffer, 3, 1, 0, 0);
         Logger::debug("after draw");
 
-        pLogicalDevice->vkd.CmdEndRenderPass(commandBuffer);
+        pLogicalDevice->vkd->CmdEndRenderPass(commandBuffer);
         Logger::debug("after end renderpass");
 
         memoryBarrier.image             = edgeImages[imageIndex];
         renderPassBeginInfo.framebuffer = blendFramebuffers[imageIndex];
         // blend renderPass
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         Logger::debug("after the first pipeline barrier");
 
         Logger::debug("before beginn blend renderpass");
-        pLogicalDevice->vkd.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        pLogicalDevice->vkd->CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
         Logger::debug("after beginn renderpass");
 
-        pLogicalDevice->vkd.CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blendPipeline);
+        pLogicalDevice->vkd->CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blendPipeline);
         Logger::debug("after bind pipeliene");
 
-        pLogicalDevice->vkd.CmdDraw(commandBuffer, 3, 1, 0, 0);
+        pLogicalDevice->vkd->CmdDraw(commandBuffer, 3, 1, 0, 0);
         Logger::debug("after draw");
 
-        pLogicalDevice->vkd.CmdEndRenderPass(commandBuffer);
+        pLogicalDevice->vkd->CmdEndRenderPass(commandBuffer);
         Logger::debug("after end renderpass");
 
         memoryBarrier.image             = blendImages[imageIndex];
         renderPassBeginInfo.framebuffer = neignborFramebuffers[imageIndex];
         renderPassBeginInfo.renderPass  = renderPass;
         // neighbor renderPass
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         Logger::debug("after the first pipeline barrier");
 
         Logger::debug("before beginn neighbor renderpass");
-        pLogicalDevice->vkd.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        pLogicalDevice->vkd->CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
         Logger::debug("after beginn renderpass");
 
-        pLogicalDevice->vkd.CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, neighborPipeline);
+        pLogicalDevice->vkd->CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, neighborPipeline);
         Logger::debug("after bind pipeliene");
 
-        pLogicalDevice->vkd.CmdDraw(commandBuffer, 3, 1, 0, 0);
+        pLogicalDevice->vkd->CmdDraw(commandBuffer, 3, 1, 0, 0);
         Logger::debug("after draw");
 
-        pLogicalDevice->vkd.CmdEndRenderPass(commandBuffer);
+        pLogicalDevice->vkd->CmdEndRenderPass(commandBuffer);
         Logger::debug("after end renderpass");
 
-        pLogicalDevice->vkd.CmdPipelineBarrier(commandBuffer,
+        pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffer,
                                                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
                                                0,
@@ -332,44 +332,44 @@ namespace vkBasalt
     SmaaEffect::~SmaaEffect()
     {
         Logger::debug("destroying smaa effect " + convertToString(this));
-        pLogicalDevice->vkd.DestroyPipeline(pLogicalDevice->device, edgePipeline, nullptr);
-        pLogicalDevice->vkd.DestroyPipeline(pLogicalDevice->device, blendPipeline, nullptr);
-        pLogicalDevice->vkd.DestroyPipeline(pLogicalDevice->device, neighborPipeline, nullptr);
+        pLogicalDevice->vkd->DestroyPipeline(pLogicalDevice->device, edgePipeline, nullptr);
+        pLogicalDevice->vkd->DestroyPipeline(pLogicalDevice->device, blendPipeline, nullptr);
+        pLogicalDevice->vkd->DestroyPipeline(pLogicalDevice->device, neighborPipeline, nullptr);
 
-        pLogicalDevice->vkd.DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
-        pLogicalDevice->vkd.DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
-        pLogicalDevice->vkd.DestroyRenderPass(pLogicalDevice->device, unormRenderPass, nullptr);
-        pLogicalDevice->vkd.DestroyDescriptorSetLayout(pLogicalDevice->device, imageSamplerDescriptorSetLayout, nullptr);
+        pLogicalDevice->vkd->DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
+        pLogicalDevice->vkd->DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
+        pLogicalDevice->vkd->DestroyRenderPass(pLogicalDevice->device, unormRenderPass, nullptr);
+        pLogicalDevice->vkd->DestroyDescriptorSetLayout(pLogicalDevice->device, imageSamplerDescriptorSetLayout, nullptr);
 
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, edgeVertexModule, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, edgeFragmentModule, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, blendVertexModule, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, blendFragmentModule, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, neighborVertexModule, nullptr);
-        pLogicalDevice->vkd.DestroyShaderModule(pLogicalDevice->device, neignborFragmentModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, edgeVertexModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, edgeFragmentModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, blendVertexModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, blendFragmentModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, neighborVertexModule, nullptr);
+        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, neignborFragmentModule, nullptr);
 
-        pLogicalDevice->vkd.DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
-        pLogicalDevice->vkd.FreeMemory(pLogicalDevice->device, imageMemory, nullptr);
-        pLogicalDevice->vkd.FreeMemory(pLogicalDevice->device, areaMemory, nullptr);
-        pLogicalDevice->vkd.FreeMemory(pLogicalDevice->device, searchMemory, nullptr);
+        pLogicalDevice->vkd->DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
+        pLogicalDevice->vkd->FreeMemory(pLogicalDevice->device, imageMemory, nullptr);
+        pLogicalDevice->vkd->FreeMemory(pLogicalDevice->device, areaMemory, nullptr);
+        pLogicalDevice->vkd->FreeMemory(pLogicalDevice->device, searchMemory, nullptr);
         for (unsigned int i = 0; i < edgeFramebuffers.size(); i++)
         {
-            pLogicalDevice->vkd.DestroyFramebuffer(pLogicalDevice->device, edgeFramebuffers[i], nullptr);
-            pLogicalDevice->vkd.DestroyFramebuffer(pLogicalDevice->device, blendFramebuffers[i], nullptr);
-            pLogicalDevice->vkd.DestroyFramebuffer(pLogicalDevice->device, neignborFramebuffers[i], nullptr);
-            pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, inputImageViews[i], nullptr);
-            pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, edgeImageViews[i], nullptr);
-            pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, blendImageViews[i], nullptr);
-            pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
-            pLogicalDevice->vkd.DestroyImage(pLogicalDevice->device, edgeImages[i], nullptr);
-            pLogicalDevice->vkd.DestroyImage(pLogicalDevice->device, blendImages[i], nullptr);
+            pLogicalDevice->vkd->DestroyFramebuffer(pLogicalDevice->device, edgeFramebuffers[i], nullptr);
+            pLogicalDevice->vkd->DestroyFramebuffer(pLogicalDevice->device, blendFramebuffers[i], nullptr);
+            pLogicalDevice->vkd->DestroyFramebuffer(pLogicalDevice->device, neignborFramebuffers[i], nullptr);
+            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, inputImageViews[i], nullptr);
+            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, edgeImageViews[i], nullptr);
+            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, blendImageViews[i], nullptr);
+            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
+            pLogicalDevice->vkd->DestroyImage(pLogicalDevice->device, edgeImages[i], nullptr);
+            pLogicalDevice->vkd->DestroyImage(pLogicalDevice->device, blendImages[i], nullptr);
         }
         Logger::debug("after DestroyImageView");
-        pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, areaImageView, nullptr);
-        pLogicalDevice->vkd.DestroyImage(pLogicalDevice->device, areaImage, nullptr);
-        pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, searchImageView, nullptr);
-        pLogicalDevice->vkd.DestroyImage(pLogicalDevice->device, searchImage, nullptr);
+        pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, areaImageView, nullptr);
+        pLogicalDevice->vkd->DestroyImage(pLogicalDevice->device, areaImage, nullptr);
+        pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, searchImageView, nullptr);
+        pLogicalDevice->vkd->DestroyImage(pLogicalDevice->device, searchImage, nullptr);
 
-        pLogicalDevice->vkd.DestroySampler(pLogicalDevice->device, sampler, nullptr);
+        pLogicalDevice->vkd->DestroySampler(pLogicalDevice->device, sampler, nullptr);
     }
 } // namespace vkBasalt

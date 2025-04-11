@@ -47,13 +47,13 @@ namespace vkBasalt
         VkResult result;
         for (uint32_t i = 0; i < count; i++)
         {
-            result = pLogicalDevice->vkd.CreateImage(pLogicalDevice->device, &imageCreateInfo, nullptr, &(fakeImages[i]));
+            result = pLogicalDevice->vkd->CreateImage(pLogicalDevice->device, &imageCreateInfo, nullptr, &(fakeImages[i]));
             ASSERT_VULKAN(result);
         }
 
         // Allocate a bunch of memory for all images at one
         VkMemoryRequirements memoryRequirements;
-        pLogicalDevice->vkd.GetImageMemoryRequirements(pLogicalDevice->device, fakeImages[0], &memoryRequirements);
+        pLogicalDevice->vkd->GetImageMemoryRequirements(pLogicalDevice->device, fakeImages[0], &memoryRequirements);
 
         Logger::debug("fake image size: " + std::to_string(memoryRequirements.size));
         Logger::debug("fake image alignment: " + std::to_string(memoryRequirements.alignment));
@@ -70,12 +70,12 @@ namespace vkBasalt
         memoryAllocateInfo.memoryTypeIndex =
             findMemoryTypeIndex(pLogicalDevice, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        result = pLogicalDevice->vkd.AllocateMemory(pLogicalDevice->device, &memoryAllocateInfo, nullptr, &deviceMemory);
+        result = pLogicalDevice->vkd->AllocateMemory(pLogicalDevice->device, &memoryAllocateInfo, nullptr, &deviceMemory);
         ASSERT_VULKAN(result);
 
         for (uint32_t i = 0; i < count; i++)
         {
-            result = pLogicalDevice->vkd.BindImageMemory(pLogicalDevice->device, fakeImages[i], deviceMemory, memoryRequirements.size * i);
+            result = pLogicalDevice->vkd->BindImageMemory(pLogicalDevice->device, fakeImages[i], deviceMemory, memoryRequirements.size * i);
             ASSERT_VULKAN(result);
         }
         return fakeImages;

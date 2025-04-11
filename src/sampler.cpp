@@ -26,7 +26,7 @@ namespace vkBasalt
         samplerCreateInfo.borderColor             = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
 
-        VkResult result = pLogicalDevice->vkd.CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
+        VkResult result = pLogicalDevice->vkd->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
         ASSERT_VULKAN(result);
         return sampler;
     }
@@ -61,7 +61,7 @@ namespace vkBasalt
         samplerCreateInfo.borderColor             = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
         samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
 
-        VkResult result = pLogicalDevice->vkd.CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
+        VkResult result = pLogicalDevice->vkd->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
         ASSERT_VULKAN(result);
         return sampler;
     }

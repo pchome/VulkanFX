@@ -14,7 +14,7 @@ namespace vkBasalt
         pipelineLayoutCreateInfo.pPushConstantRanges    = nullptr;
 
         VkPipelineLayout pipelineLayout;
-        VkResult result = pLogicalDevice->vkd.CreatePipelineLayout(pLogicalDevice->device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout);
+        VkResult result = pLogicalDevice->vkd->CreatePipelineLayout(pLogicalDevice->device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout);
         ASSERT_VULKAN(result);
         return pipelineLayout;
     }
@@ -173,7 +173,7 @@ namespace vkBasalt
         pipelineCreateInfo.basePipelineHandle  = VK_NULL_HANDLE;
         pipelineCreateInfo.basePipelineIndex   = -1;
 
-        result = pLogicalDevice->vkd.CreateGraphicsPipelines(pLogicalDevice->device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
+        result = pLogicalDevice->vkd->CreateGraphicsPipelines(pLogicalDevice->device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
         ASSERT_VULKAN(result);
 
         return pipeline;

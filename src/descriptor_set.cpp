@@ -20,7 +20,7 @@ namespace vkBasalt
         descriptorPoolCreateInfo.poolSizeCount = poolSizes.size();
         descriptorPoolCreateInfo.pPoolSizes    = poolSizes.data();
 
-        VkResult result = pLogicalDevice->vkd.CreateDescriptorPool(pLogicalDevice->device, &descriptorPoolCreateInfo, nullptr, &descriptorPool);
+        VkResult result = pLogicalDevice->vkd->CreateDescriptorPool(pLogicalDevice->device, &descriptorPoolCreateInfo, nullptr, &descriptorPool);
         ASSERT_VULKAN(result);
         return descriptorPool;
     }
@@ -44,7 +44,7 @@ namespace vkBasalt
         descriptorSetCreateInfo.pBindings    = &descriptorSetLayoutBinding;
 
         VkResult result =
-            pLogicalDevice->vkd.CreateDescriptorSetLayout(pLogicalDevice->device, &descriptorSetCreateInfo, nullptr, &descriptorSetLayout);
+            pLogicalDevice->vkd->CreateDescriptorSetLayout(pLogicalDevice->device, &descriptorSetCreateInfo, nullptr, &descriptorSetLayout);
         ASSERT_VULKAN(result)
 
         return descriptorSetLayout;
@@ -64,7 +64,7 @@ namespace vkBasalt
         descriptorSetAllocateInfo.descriptorSetCount = 1;
         descriptorSetAllocateInfo.pSetLayouts        = &descriptorSetLayout;
 
-        VkResult result = pLogicalDevice->vkd.AllocateDescriptorSets(pLogicalDevice->device, &descriptorSetAllocateInfo, &descriptorSet);
+        VkResult result = pLogicalDevice->vkd->AllocateDescriptorSets(pLogicalDevice->device, &descriptorSetAllocateInfo, &descriptorSet);
         ASSERT_VULKAN(result);
 
         VkDescriptorBufferInfo bufferInfo;
@@ -86,7 +86,7 @@ namespace vkBasalt
         writeDescriptorSet.pTexelBufferView = nullptr;
 
         Logger::debug("before writing buffer descriptor Sets");
-        pLogicalDevice->vkd.UpdateDescriptorSets(pLogicalDevice->device, 1, &writeDescriptorSet, 0, nullptr);
+        pLogicalDevice->vkd->UpdateDescriptorSets(pLogicalDevice->device, 1, &writeDescriptorSet, 0, nullptr);
 
         return descriptorSet;
     }
@@ -115,7 +115,7 @@ namespace vkBasalt
         descriptorSetCreateInfo.pBindings    = bindigs.data();
 
         VkResult result =
-            pLogicalDevice->vkd.CreateDescriptorSetLayout(pLogicalDevice->device, &descriptorSetCreateInfo, nullptr, &descriptorSetLayout);
+            pLogicalDevice->vkd->CreateDescriptorSetLayout(pLogicalDevice->device, &descriptorSetCreateInfo, nullptr, &descriptorSetLayout);
         ASSERT_VULKAN(result)
         return descriptorSetLayout;
     }
@@ -137,7 +137,7 @@ namespace vkBasalt
         descriptorSetAllocateInfo.pSetLayouts        = layouts.data();
 
         Logger::debug("before allocating descriptor Sets");
-        VkResult result = pLogicalDevice->vkd.AllocateDescriptorSets(pLogicalDevice->device, &descriptorSetAllocateInfo, descriptorSets.data());
+        VkResult result = pLogicalDevice->vkd->AllocateDescriptorSets(pLogicalDevice->device, &descriptorSetAllocateInfo, descriptorSets.data());
         ASSERT_VULKAN(result);
 
         VkDescriptorImageInfo imageInfo;
@@ -173,7 +173,7 @@ namespace vkBasalt
                 writeDescriptorSets[j].dstSet     = descriptorSets[i];
             }
             Logger::debug("before writing descriptor Sets");
-            pLogicalDevice->vkd.UpdateDescriptorSets(pLogicalDevice->device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, nullptr);
+            pLogicalDevice->vkd->UpdateDescriptorSets(pLogicalDevice->device, writeDescriptorSets.size(), writeDescriptorSets.data(), 0, nullptr);
         }
         return descriptorSets;
     }
