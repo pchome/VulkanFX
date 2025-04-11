@@ -16,7 +16,7 @@ namespace vkBasalt
 {
     VkSampler createSampler(LogicalDevice* pLogicalDevice);
 
-    VkSampler createReshadeSampler(LogicalDevice* pLogicalDevice, const reshadefx::sampler_info& samplerInfo);
+    VkSampler createReshadeSampler(LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo);
 
     VkSamplerAddressMode convertReshadeAddressMode(const reshadefx::texture_address_mode& addressMode);
 

@@ -289,7 +289,7 @@ namespace vkBasalt
 
         for (size_t i = 0; i < module.samplers.size(); i++)
         {
-            reshadefx::sampler_info info = module.samplers[i];
+            reshadefx::sampler info = module.samplers[i];
 
             VkSampler sampler = createReshadeSampler(pLogicalDevice, info);
 
@@ -422,13 +422,13 @@ namespace vkBasalt
 
                 VkPipelineColorBlendAttachmentState colorBlendAttachment;
                 colorBlendAttachment.blendEnable         = pass.blend_enable[i];
-                colorBlendAttachment.srcColorBlendFactor = convertReshadeBlendFactor(pass.src_blend[i]);
-                colorBlendAttachment.dstColorBlendFactor = convertReshadeBlendFactor(pass.dest_blend[i]);
-                colorBlendAttachment.colorBlendOp        = convertReshadeBlendOp(pass.blend_op[i]);
-                colorBlendAttachment.srcAlphaBlendFactor = convertReshadeBlendFactor(pass.src_blend_alpha[i]);
-                colorBlendAttachment.dstAlphaBlendFactor = convertReshadeBlendFactor(pass.dest_blend_alpha[i]);
-                colorBlendAttachment.alphaBlendOp        = convertReshadeBlendOp(pass.blend_op_alpha[i]);
-                colorBlendAttachment.colorWriteMask      = pass.color_write_mask[i];
+                colorBlendAttachment.srcColorBlendFactor = convertReshadeBlendFactor(pass.source_color_blend_factor[i]);
+                colorBlendAttachment.dstColorBlendFactor = convertReshadeBlendFactor(pass.dest_color_blend_factor[i]);
+                colorBlendAttachment.colorBlendOp        = convertReshadeBlendOp(pass.color_blend_op[i]);
+                colorBlendAttachment.srcAlphaBlendFactor = convertReshadeBlendFactor(pass.source_alpha_blend_factor[i]);
+                colorBlendAttachment.dstAlphaBlendFactor = convertReshadeBlendFactor(pass.dest_alpha_blend_factor[i]);
+                colorBlendAttachment.alphaBlendOp        = convertReshadeBlendOp(pass.alpha_blend_op[i]);
+                colorBlendAttachment.colorWriteMask      = pass.render_target_write_mask[i];
 
                 attachmentBlendStates.push_back(colorBlendAttachment);
 
@@ -728,9 +728,9 @@ namespace vkBasalt
             depthStencilStateCreateInfo.depthCompareOp        = VK_COMPARE_OP_ALWAYS;
             depthStencilStateCreateInfo.depthBoundsTestEnable = VK_FALSE;
             depthStencilStateCreateInfo.stencilTestEnable     = pass.stencil_enable;
-            depthStencilStateCreateInfo.front.failOp          = convertReshadeStencilOp(pass.stencil_op_fail);
-            depthStencilStateCreateInfo.front.passOp          = convertReshadeStencilOp(pass.stencil_op_pass);
-            depthStencilStateCreateInfo.front.depthFailOp     = convertReshadeStencilOp(pass.stencil_op_depth_fail);
+            depthStencilStateCreateInfo.front.failOp          = convertReshadeStencilOp(pass.stencil_fail_op);
+            depthStencilStateCreateInfo.front.passOp          = convertReshadeStencilOp(pass.stencil_pass_op);
+            depthStencilStateCreateInfo.front.depthFailOp     = convertReshadeStencilOp(pass.stencil_depth_fail_op);
             depthStencilStateCreateInfo.front.compareOp       = convertReshadeCompareOp(pass.stencil_comparison_func);
             depthStencilStateCreateInfo.front.compareMask     = pass.stencil_read_mask;
             depthStencilStateCreateInfo.front.writeMask       = pass.stencil_write_mask;
@@ -801,7 +801,7 @@ namespace vkBasalt
 
         for (size_t i = 0; i < module.samplers.size(); i++)
         {
-            reshadefx::sampler_info info = module.samplers[i];
+            reshadefx::sampler info = module.samplers[i];
             for (auto& name : depthTextureNames)
             {
                 if (info.texture_name == name)
@@ -1132,6 +1132,8 @@ namespace vkBasalt
         preprocessor.add_macro_definition("BUFFER_RCP_WIDTH", "(1.0 / BUFFER_WIDTH)");
         preprocessor.add_macro_definition("BUFFER_RCP_HEIGHT", "(1.0 / BUFFER_HEIGHT)");
         preprocessor.add_macro_definition("BUFFER_COLOR_DEPTH", (inputOutputFormatUNORM == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? "10" : "8");
+        preprocessor.add_macro_definition("BUFFER_COLOR_BIT_DEPTH", "8"); // 16 for HDR (?)
+        preprocessor.add_macro_definition("BUFFER_COLOR_SPACE", "1"); // (0 = unknown, 1 = sRGB, 2 = scRGB, 3 = HDR10 ST2084, 4 = HDR10 HLG) // see eg. VK_COLOR_SPACE_HDR10_ST2084_EXT
         preprocessor.add_include_path(pConfig->getOption<std::string>("reshadeIncludePath"));
         if (!preprocessor.append_file(pConfig->getOption<std::string>(effectName)))
         {
@@ -1156,6 +1158,9 @@ namespace vkBasalt
         {
             Logger::err(errors);
         }
+
+        /** Before ReShade 6.4.1 */
+        /*
         codegen->write_result(module);
 
         std::vector<uint32_t> spirv(
@@ -1163,6 +1168,15 @@ namespace vkBasalt
             reinterpret_cast<const uint32_t *>(module.code.data() + module.code.size()));
         // cso.resize(spirv.size() * sizeof(uint32_t));
         // std::memcpy(cso.data(), spirv.data(), cso.size());
+        */
+
+        /** ReShade 6.4.1 */
+        module = codegen->module();
+        std::basic_string<char> code = codegen->finalize_code();
+
+        std::vector<uint32_t> spirv(
+            reinterpret_cast<const uint32_t *>(code.data()),
+            reinterpret_cast<const uint32_t *>(code.data() + code.size()));
 
         VkShaderModuleCreateInfo shaderCreateInfo;
         shaderCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -1197,65 +1211,65 @@ namespace vkBasalt
         }
     }
 
-    VkCompareOp ReshadeEffect::convertReshadeCompareOp(reshadefx::pass_stencil_func compareOp)
+    VkCompareOp ReshadeEffect::convertReshadeCompareOp(reshadefx::stencil_func compareOp)
     {
         switch (compareOp)
         {
-            case reshadefx::pass_stencil_func::never: return VK_COMPARE_OP_NEVER;
-            case reshadefx::pass_stencil_func::less: return VK_COMPARE_OP_LESS;
-            case reshadefx::pass_stencil_func::equal: return VK_COMPARE_OP_EQUAL;
-            case reshadefx::pass_stencil_func::less_equal: return VK_COMPARE_OP_LESS_OR_EQUAL;
-            case reshadefx::pass_stencil_func::greater: return VK_COMPARE_OP_GREATER;
-            case reshadefx::pass_stencil_func::not_equal: return VK_COMPARE_OP_NOT_EQUAL;
-            case reshadefx::pass_stencil_func::greater_equal: return VK_COMPARE_OP_GREATER_OR_EQUAL;
-            case reshadefx::pass_stencil_func::always: return VK_COMPARE_OP_ALWAYS;
+            case reshadefx::stencil_func::never: return VK_COMPARE_OP_NEVER;
+            case reshadefx::stencil_func::less: return VK_COMPARE_OP_LESS;
+            case reshadefx::stencil_func::equal: return VK_COMPARE_OP_EQUAL;
+            case reshadefx::stencil_func::less_equal: return VK_COMPARE_OP_LESS_OR_EQUAL;
+            case reshadefx::stencil_func::greater: return VK_COMPARE_OP_GREATER;
+            case reshadefx::stencil_func::not_equal: return VK_COMPARE_OP_NOT_EQUAL;
+            case reshadefx::stencil_func::greater_equal: return VK_COMPARE_OP_GREATER_OR_EQUAL;
+            case reshadefx::stencil_func::always: return VK_COMPARE_OP_ALWAYS;
             default: return VK_COMPARE_OP_ALWAYS;
         }
     }
 
-    VkStencilOp ReshadeEffect::convertReshadeStencilOp(reshadefx::pass_stencil_op stencilOp)
+    VkStencilOp ReshadeEffect::convertReshadeStencilOp(reshadefx::stencil_op stencilOp)
     {
         switch (stencilOp)
         {
-            case reshadefx::pass_stencil_op::zero: return VK_STENCIL_OP_ZERO;
-            case reshadefx::pass_stencil_op::keep: return VK_STENCIL_OP_KEEP;
-            case reshadefx::pass_stencil_op::replace: return VK_STENCIL_OP_REPLACE;
-            case reshadefx::pass_stencil_op::increment_saturate: return VK_STENCIL_OP_INCREMENT_AND_CLAMP;
-            case reshadefx::pass_stencil_op::decrement_saturate: return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
-            case reshadefx::pass_stencil_op::invert: return VK_STENCIL_OP_INVERT;
-            case reshadefx::pass_stencil_op::increment: return VK_STENCIL_OP_INCREMENT_AND_WRAP;
-            case reshadefx::pass_stencil_op::decrement: return VK_STENCIL_OP_DECREMENT_AND_WRAP;
+            case reshadefx::stencil_op::zero: return VK_STENCIL_OP_ZERO;
+            case reshadefx::stencil_op::keep: return VK_STENCIL_OP_KEEP;
+            case reshadefx::stencil_op::replace: return VK_STENCIL_OP_REPLACE;
+            case reshadefx::stencil_op::increment_saturate: return VK_STENCIL_OP_INCREMENT_AND_CLAMP;
+            case reshadefx::stencil_op::decrement_saturate: return VK_STENCIL_OP_DECREMENT_AND_CLAMP;
+            case reshadefx::stencil_op::invert: return VK_STENCIL_OP_INVERT;
+            case reshadefx::stencil_op::increment: return VK_STENCIL_OP_INCREMENT_AND_WRAP;
+            case reshadefx::stencil_op::decrement: return VK_STENCIL_OP_DECREMENT_AND_WRAP;
             default: return VK_STENCIL_OP_KEEP;
         }
     }
 
-    VkBlendOp ReshadeEffect::convertReshadeBlendOp(reshadefx::pass_blend_op blendOp)
+    VkBlendOp ReshadeEffect::convertReshadeBlendOp(reshadefx::blend_op blendOp)
     {
         switch (blendOp)
         {
-            case reshadefx::pass_blend_op::add: return VK_BLEND_OP_ADD;
-            case reshadefx::pass_blend_op::subtract: return VK_BLEND_OP_SUBTRACT;
-            case reshadefx::pass_blend_op::reverse_subtract: return VK_BLEND_OP_REVERSE_SUBTRACT;
-            case reshadefx::pass_blend_op::min: return VK_BLEND_OP_MIN;
-            case reshadefx::pass_blend_op::max: return VK_BLEND_OP_MAX;
+            case reshadefx::blend_op::add: return VK_BLEND_OP_ADD;
+            case reshadefx::blend_op::subtract: return VK_BLEND_OP_SUBTRACT;
+            case reshadefx::blend_op::reverse_subtract: return VK_BLEND_OP_REVERSE_SUBTRACT;
+            case reshadefx::blend_op::min: return VK_BLEND_OP_MIN;
+            case reshadefx::blend_op::max: return VK_BLEND_OP_MAX;
             default: return VK_BLEND_OP_ADD;
         }
     }
 
-    VkBlendFactor ReshadeEffect::convertReshadeBlendFactor(reshadefx::pass_blend_factor blendFactor)
+    VkBlendFactor ReshadeEffect::convertReshadeBlendFactor(reshadefx::blend_factor blendFactor)
     {
         switch (blendFactor)
         {
-            case reshadefx::pass_blend_factor::zero: return VK_BLEND_FACTOR_ZERO;
-            case reshadefx::pass_blend_factor::one: return VK_BLEND_FACTOR_ONE;
-            case reshadefx::pass_blend_factor::source_color: return VK_BLEND_FACTOR_SRC_COLOR;
-            case reshadefx::pass_blend_factor::source_alpha: return VK_BLEND_FACTOR_SRC_ALPHA;
-            case reshadefx::pass_blend_factor::one_minus_source_color: return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
-            case reshadefx::pass_blend_factor::one_minus_source_alpha: return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-            case reshadefx::pass_blend_factor::dest_alpha: return VK_BLEND_FACTOR_DST_ALPHA;
-            case reshadefx::pass_blend_factor::one_minus_dest_alpha: return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
-            case reshadefx::pass_blend_factor::dest_color: return VK_BLEND_FACTOR_DST_COLOR;
-            case reshadefx::pass_blend_factor::one_minus_dest_color: return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
+            case reshadefx::blend_factor::zero: return VK_BLEND_FACTOR_ZERO;
+            case reshadefx::blend_factor::one: return VK_BLEND_FACTOR_ONE;
+            case reshadefx::blend_factor::source_color: return VK_BLEND_FACTOR_SRC_COLOR;
+            case reshadefx::blend_factor::source_alpha: return VK_BLEND_FACTOR_SRC_ALPHA;
+            case reshadefx::blend_factor::one_minus_source_color: return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
+            case reshadefx::blend_factor::one_minus_source_alpha: return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            case reshadefx::blend_factor::dest_alpha: return VK_BLEND_FACTOR_DST_ALPHA;
+            case reshadefx::blend_factor::one_minus_dest_alpha: return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
+            case reshadefx::blend_factor::dest_color: return VK_BLEND_FACTOR_DST_COLOR;
+            case reshadefx::blend_factor::one_minus_dest_color: return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
             default: return VK_BLEND_FACTOR_ZERO;
         }
     }

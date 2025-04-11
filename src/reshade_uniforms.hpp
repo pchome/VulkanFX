@@ -14,7 +14,7 @@
 
 namespace vkBasalt
 {
-    void enumerateReshadeUniforms(reshadefx::module module);
+    void enumerateReshadeUniforms(reshadefx::effect_module module);
 
     class ReshadeUniform
     {
@@ -27,12 +27,12 @@ namespace vkBasalt
         uint32_t size;
     };
 
-    std::vector<std::shared_ptr<ReshadeUniform>> createReshadeUniforms(reshadefx::module module);
+    std::vector<std::shared_ptr<ReshadeUniform>> createReshadeUniforms(reshadefx::effect_module module);
 
     class FrameTimeUniform : public ReshadeUniform
     {
     public:
-        FrameTimeUniform(reshadefx::uniform_info uniformInfo);
+        FrameTimeUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~FrameTimeUniform();
 
@@ -43,7 +43,7 @@ namespace vkBasalt
     class FrameCountUniform : public ReshadeUniform
     {
     public:
-        FrameCountUniform(reshadefx::uniform_info uniformInfo);
+        FrameCountUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~FrameCountUniform();
 
@@ -54,7 +54,7 @@ namespace vkBasalt
     class DateUniform : public ReshadeUniform
     {
     public:
-        DateUniform(reshadefx::uniform_info uniformInfo);
+        DateUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~DateUniform();
     };
@@ -62,7 +62,7 @@ namespace vkBasalt
     class TimerUniform : public ReshadeUniform
     {
     public:
-        TimerUniform(reshadefx::uniform_info uniformInfo);
+        TimerUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~TimerUniform();
 
@@ -73,7 +73,7 @@ namespace vkBasalt
     class PingPongUniform : public ReshadeUniform
     {
     public:
-        PingPongUniform(reshadefx::uniform_info uniformInfo);
+        PingPongUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~PingPongUniform();
 
@@ -91,7 +91,7 @@ namespace vkBasalt
     class RandomUniform : public ReshadeUniform
     {
     public:
-        RandomUniform(reshadefx::uniform_info uniformInfo);
+        RandomUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~RandomUniform();
 
@@ -103,7 +103,7 @@ namespace vkBasalt
     class KeyUniform : public ReshadeUniform
     {
     public:
-        KeyUniform(reshadefx::uniform_info uniformInfo);
+        KeyUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~KeyUniform();
     };
@@ -111,7 +111,7 @@ namespace vkBasalt
     class MouseButtonUniform : public ReshadeUniform
     {
     public:
-        MouseButtonUniform(reshadefx::uniform_info uniformInfo);
+        MouseButtonUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~MouseButtonUniform();
     };
@@ -119,7 +119,7 @@ namespace vkBasalt
     class MousePointUniform : public ReshadeUniform
     {
     public:
-        MousePointUniform(reshadefx::uniform_info uniformInfo);
+        MousePointUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~MousePointUniform();
     };
@@ -127,7 +127,7 @@ namespace vkBasalt
     class MouseDeltaUniform : public ReshadeUniform
     {
     public:
-        MouseDeltaUniform(reshadefx::uniform_info uniformInfo);
+        MouseDeltaUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~MouseDeltaUniform();
     };
@@ -135,7 +135,7 @@ namespace vkBasalt
     class DepthUniform : public ReshadeUniform
     {
     public:
-        DepthUniform(reshadefx::uniform_info uniformInfo);
+        DepthUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~DepthUniform();
     };

@@ -31,7 +31,7 @@ namespace vkBasalt
         return sampler;
     }
 
-    VkSampler createReshadeSampler(LogicalDevice* pLogicalDevice, const reshadefx::sampler_info& samplerInfo)
+    VkSampler createReshadeSampler(LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
     {
         VkSampler sampler;
 
@@ -122,6 +122,14 @@ namespace vkBasalt
                 magFilter  = VK_FILTER_LINEAR;
                 mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
                 return;
+            case reshadefx::filter_mode::anisotropic:
+            default: // (?)
+                minFilter  = VK_FILTER_LINEAR;
+                magFilter  = VK_FILTER_LINEAR;
+                mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+                return;
+            // TODO: check (and maybe use) reshade::vulkan::convert_sampler_desc
+            // source/vulkan/vulkan_impl_type_convert.hpp
         }
     }
 } // namespace vkBasalt

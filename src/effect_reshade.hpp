@@ -77,7 +77,7 @@ namespace vkBasalt
         std::vector<VkSampler>                samplers;
         Config*                               pConfig;
         std::string                           effectName;
-        reshadefx::module                     module;
+        reshadefx::effect_module              module;
         std::vector<VkDeviceMemory>           textureMemory;
 
         VkFormat    inputOutputFormatUNORM;
@@ -100,10 +100,10 @@ namespace vkBasalt
 
         void          createReshadeModule();
         VkFormat      convertReshadeFormat(reshadefx::texture_format texFormat);
-        VkCompareOp   convertReshadeCompareOp(reshadefx::pass_stencil_func compareOp);
-        VkStencilOp   convertReshadeStencilOp(reshadefx::pass_stencil_op stencilOp);
-        VkBlendOp     convertReshadeBlendOp(reshadefx::pass_blend_op blendOp);
-        VkBlendFactor convertReshadeBlendFactor(reshadefx::pass_blend_factor blendFactor);
+        VkCompareOp   convertReshadeCompareOp(reshadefx::stencil_func compareOp);
+        VkStencilOp   convertReshadeStencilOp(reshadefx::stencil_op stencilOp);
+        VkBlendOp     convertReshadeBlendOp(reshadefx::blend_op blendOp);
+        VkBlendFactor convertReshadeBlendFactor(reshadefx::blend_factor blendFactor);
     };
 } // namespace vkBasalt
 
