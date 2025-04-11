@@ -36,7 +36,9 @@
 #include "effect_smaa.hpp"
 #include "effect_deband.hpp"
 #include "effect_lut.hpp"
+#if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
 #include "effect_reshade.hpp"
+#endif
 #include "effect_transfer.hpp"
 
 #define VKBASALT_NAME "VK_LAYER_VKBASALT_post_processing"
@@ -468,6 +470,7 @@ namespace vkBasalt
             }
             else
             {
+#if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
                 pLogicalSwapchain->effects.push_back(std::shared_ptr<Effect>(new ReshadeEffect(pLogicalDevice,
                                                                                                pLogicalSwapchain->format,
                                                                                                pLogicalSwapchain->imageExtent,
@@ -476,6 +479,9 @@ namespace vkBasalt
                                                                                                pConfig.get(),
                                                                                                effectStrings[i])));
                 Logger::debug("created ReshadeEffect");
+#else
+                Logger::debug("ReshadeEffects disabled");
+#endif
             }
         }
 
@@ -625,6 +631,7 @@ namespace vkBasalt
         pLogicalDevice->vkd.DestroySwapchainKHR(device, swapchain, pAllocator);
     }
 
+#if !defined(DISABLE_DEPTH_CAPTURE) || DISABLE_DEPTH_CAPTURE == 0
     VKAPI_ATTR VkResult VKAPI_CALL vkBasalt_CreateImage(VkDevice                     device,
                                                         const VkImageCreateInfo*     pCreateInfo,
                                                         const VkAllocationCallbacks* pAllocator,
@@ -761,6 +768,7 @@ namespace vkBasalt
 
         pLogicalDevice->vkd.DestroyImage(pLogicalDevice->device, image, pAllocator);
     }
+#endif
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // Enumeration function

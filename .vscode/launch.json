@@ -1,0 +1,77 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug default",
+            "program": "vkgears",
+            // Usage:
+            //      -samples N              run in multisample mode with N samples
+            //      -present-mailbox        run with present mode mailbox
+            //      -fullscreen             run in fullscreen mode
+            //      -info                   display Vulkan device info
+            //      -size WxH               window size
+            "args": [
+                "-size",    "500x500",
+                "-samples", "8"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_default",
+                "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
+                "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
+                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders"
+            }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug simple",
+            "program": "vkgears",
+            // Usage:
+            //      -samples N              run in multisample mode with N samples
+            //      -present-mailbox        run with present mode mailbox
+            //      -fullscreen             run in fullscreen mode
+            //      -info                   display Vulkan device info
+            //      -size WxH               window size
+            "args": [
+                "-size",    "500x500",
+                "-samples", "8"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_simple",
+                "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
+                "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
+                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders"
+            }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug depth",
+            "program": "vkgears",
+            // Usage:
+            //      -samples N              run in multisample mode with N samples
+            //      -present-mailbox        run with present mode mailbox
+            //      -fullscreen             run in fullscreen mode
+            //      -info                   display Vulkan device info
+            //      -size WxH               window size
+            "args": [
+                "-size",    "500x500",
+                "-samples", "8"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_depth",
+                "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
+                "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
+                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders"
+            }
+        }
+    ]
+}

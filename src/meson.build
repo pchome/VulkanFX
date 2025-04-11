@@ -1,6 +1,7 @@
 subdir('shader')
 reshade_dep = dependency('ReShadeFX')
 
+# TODO: split depth, reshade and simple sources
 vkBasalt_src = [
     'basalt.cpp',
     'buffer.cpp',
@@ -13,7 +14,7 @@ vkBasalt_src = [
     'effect_dls.cpp',
     'effect_fxaa.cpp',
     'effect_lut.cpp',
-    'effect_reshade.cpp',
+
     'effect_simple.cpp',
     'effect_smaa.cpp',
     'effect_transfer.cpp',
@@ -29,13 +30,18 @@ vkBasalt_src = [
     'lut_cube.cpp',
     'memory.cpp',
     'renderpass.cpp',
-    'reshade_uniforms.cpp',
+
     'sampler.cpp',
     'shader.cpp',
     'stb_image.c',
     'stb_image_resize.c',
     'util.cpp',
     'vkdispatch.cpp',
+]
+
+reshadefx_src = [
+    'effect_reshade.cpp',
+    'reshade_uniforms.cpp',
 ]
 
 x11_dep = dependency('x11')
@@ -51,11 +57,29 @@ configure_file(output: 'config_paths.hpp',
 # which conflicts with the rest codebase with with Meson --unity=on option
 keyboard_input_x11_lib = static_library('keyboard_input_x11', 'keyboard_input_x11.cpp')
 
-shared_library(meson.project_name().to_lower(),
-    vkBasalt_src, shader_include,
+shared_library('VkLayer_VulkanFX_default', vkBasalt_src, reshadefx_src, shader_include,
+    cpp_args: ['-DDISABLE_DEPTH_CAPTURE=1'],
     link_with: [keyboard_input_x11_lib],
     include_directories : vkBasalt_include_path,
     dependencies : [x11_dep, reshade_dep],
+    gnu_symbol_visibility: 'hidden',
+    install : true,
+    install_dir : lib_dir)
+
+shared_library('VkLayer_VulkanFX_depth', vkBasalt_src, reshadefx_src, shader_include,
+    link_with: [keyboard_input_x11_lib],
+    include_directories : vkBasalt_include_path,
+    dependencies : [x11_dep, reshade_dep],
+    gnu_symbol_visibility: 'hidden',
+    install : true,
+    install_dir : lib_dir)
+
+shared_library('VkLayer_VulkanFX_simple', vkBasalt_src, shader_include,
+    cpp_args: ['-DDISABLE_RESHADEFX=1', '-DDISABLE_DEPTH_CAPTURE=1'],
+    link_with: [keyboard_input_x11_lib],
+    include_directories : vkBasalt_include_path,
+    # dependencies : [x11_dep, reshade_dep],
+    dependencies : [x11_dep],
     gnu_symbol_visibility: 'hidden',
     install : true,
     install_dir : lib_dir)
