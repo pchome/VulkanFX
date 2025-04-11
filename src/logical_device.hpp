@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <vkroots.h>
 
 #include "vulkan_include.hpp"
 #include "vkdispatch.hpp"
@@ -13,8 +14,10 @@ namespace vkBasalt
 {
     struct LogicalDevice
     {
-        DeviceDispatch           vkd;
-        InstanceDispatch         vki;
+        // DeviceDispatch           vkd;
+        // InstanceDispatch         vki;
+        const vkroots::VkDeviceDispatch* vkd;
+        const vkroots::VkInstanceDispatch* vki;
         VkDevice                 device;
         VkPhysicalDevice         physicalDevice;
         VkInstance               instance;

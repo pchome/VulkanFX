@@ -15,7 +15,7 @@ namespace vkBasalt
         shaderCreateInfo.codeSize = code.size();
         shaderCreateInfo.pCode    = (uint32_t*) code.data();
 
-        VkResult result = pLogicalDevice->vkd.CreateShaderModule(pLogicalDevice->device, &shaderCreateInfo, nullptr, shaderModule);
+        VkResult result = pLogicalDevice->vkd->CreateShaderModule(pLogicalDevice->device, &shaderCreateInfo, nullptr, shaderModule);
         ASSERT_VULKAN(result);
     }
 
@@ -29,7 +29,7 @@ namespace vkBasalt
         shaderCreateInfo.codeSize = code.size() * sizeof(uint32_t);
         shaderCreateInfo.pCode    = code.data();
 
-        VkResult result = pLogicalDevice->vkd.CreateShaderModule(pLogicalDevice->device, &shaderCreateInfo, nullptr, shaderModule);
+        VkResult result = pLogicalDevice->vkd->CreateShaderModule(pLogicalDevice->device, &shaderCreateInfo, nullptr, shaderModule);
         ASSERT_VULKAN(result);
     }
 } // namespace vkBasalt

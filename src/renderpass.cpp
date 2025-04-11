@@ -53,7 +53,7 @@ namespace vkBasalt
         renderPassCreateInfo.dependencyCount = 1;
         renderPassCreateInfo.pDependencies   = &subpassDependency;
 
-        VkResult result = pLogicalDevice->vkd.CreateRenderPass(pLogicalDevice->device, &renderPassCreateInfo, nullptr, &renderPass);
+        VkResult result = pLogicalDevice->vkd->CreateRenderPass(pLogicalDevice->device, &renderPassCreateInfo, nullptr, &renderPass);
         ASSERT_VULKAN(result);
 
         return renderPass;

@@ -16,7 +16,7 @@ namespace vkBasalt
         allocInfo.commandPool        = pLogicalDevice->commandPool;
         allocInfo.commandBufferCount = count;
 
-        VkResult result = pLogicalDevice->vkd.AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, commandBuffers.data());
+        VkResult result = pLogicalDevice->vkd->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, commandBuffers.data());
         ASSERT_VULKAN(result);
         for (uint32_t i = 0; i < count; i++)
         {
@@ -48,7 +48,7 @@ namespace vkBasalt
         for (uint32_t i = 0; i < commandBuffers.size(); i++)
         {
 
-            VkResult result = pLogicalDevice->vkd.BeginCommandBuffer(commandBuffers[i], &beginInfo);
+            VkResult result = pLogicalDevice->vkd->BeginCommandBuffer(commandBuffers[i], &beginInfo);
             ASSERT_VULKAN(result);
 
             VkImageMemoryBarrier memoryBarrier;
@@ -70,7 +70,7 @@ namespace vkBasalt
 
             if (depthImageView)
             {
-                pLogicalDevice->vkd.CmdPipelineBarrier(commandBuffers[i],
+                pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffers[i],
                                                        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                                                        VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
                                                        0,
@@ -93,7 +93,7 @@ namespace vkBasalt
             memoryBarrier.dstAccessMask = 0;
             if (depthImageView)
             {
-                pLogicalDevice->vkd.CmdPipelineBarrier(commandBuffers[i],
+                pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffers[i],
                                                        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
                                                        VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
                                                        0,
@@ -105,7 +105,7 @@ namespace vkBasalt
                                                        &memoryBarrier);
             }
 
-            result = pLogicalDevice->vkd.EndCommandBuffer(commandBuffers[i]);
+            result = pLogicalDevice->vkd->EndCommandBuffer(commandBuffers[i]);
             ASSERT_VULKAN(result);
         }
     }
@@ -120,7 +120,7 @@ namespace vkBasalt
 
         for (uint32_t i = 0; i < count; i++)
         {
-            pLogicalDevice->vkd.CreateSemaphore(pLogicalDevice->device, &info, nullptr, &semaphores[i]);
+            pLogicalDevice->vkd->CreateSemaphore(pLogicalDevice->device, &info, nullptr, &semaphores[i]);
         }
         return semaphores;
     }

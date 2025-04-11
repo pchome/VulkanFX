@@ -47,17 +47,17 @@ namespace vkBasalt
         memoryBarrier.subresourceRange.baseArrayLayer = 0;
         memoryBarrier.subresourceRange.layerCount     = 1;
 
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
         memoryBarrier.image         = outputImages[imageIndex];
         memoryBarrier.oldLayout     = VK_IMAGE_LAYOUT_UNDEFINED;
         memoryBarrier.newLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         memoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
-        pLogicalDevice->vkd.CmdCopyImage(commandBuffer,
+        pLogicalDevice->vkd->CmdCopyImage(commandBuffer,
                                          inputImages[imageIndex],
                                          VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                                          outputImages[imageIndex],
@@ -70,14 +70,14 @@ namespace vkBasalt
         memoryBarrier.image         = outputImages[imageIndex];
         memoryBarrier.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         memoryBarrier.newLayout     = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
         memoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
         memoryBarrier.image         = inputImages[imageIndex];
         memoryBarrier.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
         memoryBarrier.newLayout     = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-        pLogicalDevice->vkd.CmdPipelineBarrier(
+        pLogicalDevice->vkd->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
     }
 

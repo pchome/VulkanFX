@@ -110,15 +110,15 @@ namespace vkBasalt
     }
     LutEffect::~LutEffect()
     {
-        pLogicalDevice->vkd.DestroyImageView(pLogicalDevice->device, lutImageView, nullptr);
-        pLogicalDevice->vkd.DestroyImage(pLogicalDevice->device, lutImage, nullptr);
-        pLogicalDevice->vkd.DestroyDescriptorSetLayout(pLogicalDevice->device, lutDescriptorSetLayout, nullptr);
-        pLogicalDevice->vkd.DestroyDescriptorPool(pLogicalDevice->device, lutDescriptorPool, nullptr);
-        pLogicalDevice->vkd.FreeMemory(pLogicalDevice->device, lutMemory, nullptr);
+        pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, lutImageView, nullptr);
+        pLogicalDevice->vkd->DestroyImage(pLogicalDevice->device, lutImage, nullptr);
+        pLogicalDevice->vkd->DestroyDescriptorSetLayout(pLogicalDevice->device, lutDescriptorSetLayout, nullptr);
+        pLogicalDevice->vkd->DestroyDescriptorPool(pLogicalDevice->device, lutDescriptorPool, nullptr);
+        pLogicalDevice->vkd->FreeMemory(pLogicalDevice->device, lutMemory, nullptr);
     }
     void LutEffect::applyEffect(uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {
-        pLogicalDevice->vkd.CmdBindDescriptorSets(
+        pLogicalDevice->vkd->CmdBindDescriptorSets(
             commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &(lutDescriptorSet), 0, nullptr);
         SimpleEffect::applyEffect(imageIndex, commandBuffer);
     }
