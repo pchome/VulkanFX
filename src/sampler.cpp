@@ -31,6 +31,7 @@ namespace vkBasalt
         return sampler;
     }
 
+#if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
     VkSampler createReshadeSampler(LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
     {
         VkSampler sampler;
@@ -132,4 +133,5 @@ namespace vkBasalt
             // source/vulkan/vulkan_impl_type_convert.hpp
         }
     }
+#endif
 } // namespace vkBasalt
