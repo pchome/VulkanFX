@@ -24,7 +24,7 @@
                 "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_default",
                 "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
                 "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
-                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders"
+                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=${workspaceFolder}/build-data/Daltonize.fx;reshadeTexturePath=${workspaceFolder}/build-data;reshadeIncludePath=${workspaceFolder}/build-data"
             }
         },
         {
@@ -47,7 +47,7 @@
                 "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_simple",
                 "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
                 "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
-                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders"
+                "VKBASALT_CONFIG": "effects=fxaa:cas;casSharpness=1.0"
             }
         },
         {
@@ -70,7 +70,24 @@
                 "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_depth",
                 "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
                 "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
-                "VKBASALT_CONFIG": "effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders"
+                "VKBASALT_CONFIG": "effects=depth;depth=${workspaceFolder}/build-data/DisplayDepth.fx;reshadeTexturePath=${workspaceFolder}/build-data;reshadeIncludePath=${workspaceFolder}/build-data",
+                "VKBASALT_LOG_LEVEL": "debug"
+            }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug depth (wine)",
+            "program": "sh",
+            "args": [
+                "run-dbg.sh"
+            ],
+            "cwd": "${workspaceFolder}/build-data/game",
+            "env": {
+                "VK_INSTANCE_LAYERS": "VK_LAYER_VULKANFX_depth",
+                "VK_ADD_LAYER_PATH": "${workspaceFolder}/builddir/config",
+                "LD_LIBRARY_PATH": "${workspaceFolder}/builddir/src:${LD_LIBRARY_PATH}",
+                "VKBASALT_CONFIG": "effects=depth;depth=${workspaceFolder}/build-data/DisplayDepth.fx;reshadeTexturePath=${workspaceFolder}/build-data;reshadeIncludePath=${workspaceFolder}/build-data"
             }
         }
     ]
