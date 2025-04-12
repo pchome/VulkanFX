@@ -4,7 +4,6 @@
 
 #include "image_view.hpp"
 #include "descriptor_set.hpp"
-#include "buffer.hpp"
 #include "renderpass.hpp"
 #include "graphics_pipeline.hpp"
 #include "framebuffer.hpp"
@@ -17,15 +16,17 @@ namespace vkBasalt
     SimpleEffect::SimpleEffect()
     {
     }
-    void SimpleEffect::init(LogicalDevice*       pLogicalDevice,
-                            VkFormat             format,
-                            VkExtent2D           imageExtent,
-                            std::vector<VkImage> inputImages,
-                            std::vector<VkImage> outputImages,
-                            Config*              pConfig)
+    void SimpleEffect::init(const vkroots::VkDeviceDispatch* pDispatch,
+                            LogicalDevice*                   pLogicalDevice,
+                            VkFormat                         format,
+                            VkExtent2D                       imageExtent,
+                            std::vector<VkImage>             inputImages,
+                            std::vector<VkImage>             outputImages,
+                            Config*                          pConfig)
     {
         Logger::debug("in creating SimpleEffect");
 
+        this->pDispatch      = pDispatch;
         this->pLogicalDevice = pLogicalDevice;
         this->format         = format;
         this->imageExtent    = imageExtent;
@@ -33,14 +34,14 @@ namespace vkBasalt
         this->outputImages   = outputImages;
         this->pConfig        = pConfig;
 
-        inputImageViews = createImageViews(pLogicalDevice, format, inputImages);
+        inputImageViews = createImageViews(pDispatch, pLogicalDevice, format, inputImages);
         Logger::debug("created input ImageViews");
-        outputImageViews = createImageViews(pLogicalDevice, format, outputImages);
+        outputImageViews = createImageViews(pDispatch, pLogicalDevice, format, outputImages);
         Logger::debug("created ImageViews");
-        sampler = createSampler(pLogicalDevice);
+        sampler = createSampler(pDispatch, pLogicalDevice);
         Logger::debug("created sampler");
 
-        imageSamplerDescriptorSetLayout = createImageSamplerDescriptorSetLayout(pLogicalDevice, 1);
+        imageSamplerDescriptorSetLayout = createImageSamplerDescriptorSetLayout(pDispatch, pLogicalDevice, 1);
         Logger::debug("created descriptorSetLayouts");
 
         VkDescriptorPoolSize imagePoolSize;
@@ -49,18 +50,19 @@ namespace vkBasalt
 
         std::vector<VkDescriptorPoolSize> poolSizes = {imagePoolSize};
 
-        descriptorPool = createDescriptorPool(pLogicalDevice, poolSizes);
+        descriptorPool = createDescriptorPool(pDispatch, pLogicalDevice, poolSizes);
         Logger::debug("created descriptorPool");
 
-        createShaderModule(pLogicalDevice, vertexCode, &vertexModule);
-        createShaderModule(pLogicalDevice, fragmentCode, &fragmentModule);
+        createShaderModule(pDispatch, pLogicalDevice, vertexCode, &vertexModule);
+        createShaderModule(pDispatch, pLogicalDevice, fragmentCode, &fragmentModule);
 
-        renderPass = createRenderPass(pLogicalDevice, format);
+        renderPass = createRenderPass(pDispatch, pLogicalDevice, format);
 
         descriptorSetLayouts.insert(descriptorSetLayouts.begin(), imageSamplerDescriptorSetLayout);
-        pipelineLayout = createGraphicsPipelineLayout(pLogicalDevice, descriptorSetLayouts);
+        pipelineLayout = createGraphicsPipelineLayout(pDispatch, pLogicalDevice, descriptorSetLayouts);
 
-        graphicsPipeline = createGraphicsPipeline(pLogicalDevice,
+        graphicsPipeline = createGraphicsPipeline(pDispatch,
+                                                  pLogicalDevice,
                                                   vertexModule,
                                                   pVertexSpecInfo,
                                                   "main",
@@ -71,12 +73,16 @@ namespace vkBasalt
                                                   renderPass,
                                                   pipelineLayout);
 
-        imageDescriptorSets = allocateAndWriteImageSamplerDescriptorSets(
-            pLogicalDevice, descriptorPool, imageSamplerDescriptorSetLayout, {sampler}, std::vector<std::vector<VkImageView>>(1, inputImageViews));
+        imageDescriptorSets = allocateAndWriteImageSamplerDescriptorSets(pDispatch,
+                                                                         pLogicalDevice,
+                                                                         descriptorPool,
+                                                                         imageSamplerDescriptorSetLayout,
+                                                                         {sampler},
+                                                                         std::vector<std::vector<VkImageView>>(1, inputImageViews));
 
-        framebuffers = createFramebuffers(pLogicalDevice, renderPass, imageExtent, {outputImageViews});
+        framebuffers = createFramebuffers(pDispatch, pLogicalDevice, renderPass, imageExtent, {outputImageViews});
     }
-    void SimpleEffect::applyEffect(uint32_t imageIndex, VkCommandBuffer commandBuffer)
+    void SimpleEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {
         Logger::debug("applying SimpleEffect to cb " + convertToString(commandBuffer));
         // Used to make the Image accessable by the shader
@@ -115,7 +121,7 @@ namespace vkBasalt
         secondBarrier.subresourceRange.baseArrayLayer = 0;
         secondBarrier.subresourceRange.layerCount     = 1;
 
-        pLogicalDevice->vkd->CmdPipelineBarrier(
+        pDispatch->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         Logger::debug("after the first pipeline barrier");
 
@@ -131,52 +137,52 @@ namespace vkBasalt
         renderPassBeginInfo.pClearValues      = &clearValue;
 
         Logger::debug("before beginn renderpass");
-        pLogicalDevice->vkd->CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        pDispatch->CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
         Logger::debug("after beginn renderpass");
 
-        pLogicalDevice->vkd->CmdBindDescriptorSets(
+        pDispatch->CmdBindDescriptorSets(
             commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &(imageDescriptorSets[imageIndex]), 0, nullptr);
         Logger::debug("after binding image sampler");
 
-        pLogicalDevice->vkd->CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+        pDispatch->CmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
         Logger::debug("after bind pipeliene");
 
-        pLogicalDevice->vkd->CmdDraw(commandBuffer, 3, 1, 0, 0);
+        pDispatch->CmdDraw(commandBuffer, 3, 1, 0, 0);
         Logger::debug("after draw");
 
-        pLogicalDevice->vkd->CmdEndRenderPass(commandBuffer);
+        pDispatch->CmdEndRenderPass(commandBuffer);
         Logger::debug("after end renderpass");
 
-        pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffer,
-                                               VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                                               VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-                                               0,
-                                               0,
-                                               nullptr,
-                                               0,
-                                               nullptr,
-                                               1,
-                                               &secondBarrier);
+        pDispatch->CmdPipelineBarrier(commandBuffer,
+                                      VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                      VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                                      0,
+                                      0,
+                                      nullptr,
+                                      0,
+                                      nullptr,
+                                      1,
+                                      &secondBarrier);
         Logger::debug("after the second pipeline barrier");
     }
     SimpleEffect::~SimpleEffect()
     {
         Logger::debug("destroying SimpleEffect " + convertToString(this));
-        pLogicalDevice->vkd->DestroyPipeline(pLogicalDevice->device, graphicsPipeline, nullptr);
-        pLogicalDevice->vkd->DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
-        pLogicalDevice->vkd->DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
-        pLogicalDevice->vkd->DestroyDescriptorSetLayout(pLogicalDevice->device, imageSamplerDescriptorSetLayout, nullptr);
-        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, vertexModule, nullptr);
-        pLogicalDevice->vkd->DestroyShaderModule(pLogicalDevice->device, fragmentModule, nullptr);
+        pDispatch->DestroyPipeline(pLogicalDevice->device, graphicsPipeline, nullptr);
+        pDispatch->DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
+        pDispatch->DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
+        pDispatch->DestroyDescriptorSetLayout(pLogicalDevice->device, imageSamplerDescriptorSetLayout, nullptr);
+        pDispatch->DestroyShaderModule(pLogicalDevice->device, vertexModule, nullptr);
+        pDispatch->DestroyShaderModule(pLogicalDevice->device, fragmentModule, nullptr);
 
-        pLogicalDevice->vkd->DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
+        pDispatch->DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
         for (unsigned int i = 0; i < framebuffers.size(); i++)
         {
-            pLogicalDevice->vkd->DestroyFramebuffer(pLogicalDevice->device, framebuffers[i], nullptr);
-            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, inputImageViews[i], nullptr);
-            pLogicalDevice->vkd->DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
+            pDispatch->DestroyFramebuffer(pLogicalDevice->device, framebuffers[i], nullptr);
+            pDispatch->DestroyImageView(pLogicalDevice->device, inputImageViews[i], nullptr);
+            pDispatch->DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
         }
         Logger::debug("after DestroyImageView");
-        pLogicalDevice->vkd->DestroySampler(pLogicalDevice->device, sampler, nullptr);
+        pDispatch->DestroySampler(pLogicalDevice->device, sampler, nullptr);
     }
 } // namespace vkBasalt

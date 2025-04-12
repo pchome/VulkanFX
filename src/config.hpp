@@ -1,14 +1,11 @@
+#pragma once
 #ifndef CONFIG_HPP_INCLUDED
 #define CONFIG_HPP_INCLUDED
 #include <vector>
 #include <fstream>
 #include <string>
-#include <iostream>
-#include <vector>
 #include <unordered_map>
 #include <cstdlib>
-
-#include "vulkan_include.hpp"
 
 namespace vkBasalt
 {
@@ -19,7 +16,7 @@ namespace vkBasalt
         Config(const Config& other);
 
         template<typename T>
-        T getOption(const std::string& option, const T& defaultValue = {})
+        auto getOption(const std::string& option, const T& defaultValue = {}) -> T
         {
             T result = defaultValue;
             parseOption(option, result);

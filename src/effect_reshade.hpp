@@ -1,50 +1,41 @@
+#pragma once
 #ifndef EFFECT_RESHADE_HPP_INCLUDED
 #define EFFECT_RESHADE_HPP_INCLUDED
 #include <vector>
-#include <fstream>
 #include <string>
-#include <iostream>
-#include <vector>
 #include <unordered_map>
 #include <memory>
-
-#include "vulkan_include.hpp"
-
 #include "effect.hpp"
 #include "config.hpp"
 #include "reshade_uniforms.hpp"
-
-#include "logical_device.hpp"
-
-#include "reshade/effect_parser.hpp"
-#include "reshade/effect_codegen.hpp"
-#include "reshade/effect_preprocessor.hpp"
 
 namespace vkBasalt
 {
     class ReshadeEffect : public Effect
     {
     public:
-        ReshadeEffect(LogicalDevice*       pLogicalDevice,
-                      VkFormat             format,
-                      VkExtent2D           imageExtent,
-                      std::vector<VkImage> inputImages,
-                      std::vector<VkImage> outputImages,
-                      Config*              pConfig,
-                      std::string          effectName);
-        void virtual applyEffect(uint32_t imageIndex, VkCommandBuffer commandBuffer) override;
-        void virtual updateEffect() override;
-        void virtual useDepthImage(VkImageView depthImageView) override;
+        ReshadeEffect(const vkroots::VkDeviceDispatch* pDispatch,
+                      LogicalDevice*                   pLogicalDevice,
+                      VkFormat                         format,
+                      VkExtent2D                       imageExtent,
+                      std::vector<VkImage>             inputImages,
+                      std::vector<VkImage>             outputImages,
+                      Config*                          pConfig,
+                      std::string                      effectName);
+        void virtual applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer) override;
+        void virtual updateEffect(const vkroots::VkDeviceDispatch* pDispatch) override;
+        void virtual useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView) override;
         virtual ~ReshadeEffect();
 
     private:
-        LogicalDevice*           pLogicalDevice;
-        std::vector<VkImage>     inputImages;
-        std::vector<VkImage>     outputImages;
-        std::vector<VkImageView> inputImageViewsSRGB;
-        std::vector<VkImageView> inputImageViewsUNORM;
-        std::vector<VkImageView> outputImageViewsSRGB;
-        std::vector<VkImageView> outputImageViewsUNORM;
+        const vkroots::VkDeviceDispatch* pDispatch;
+        LogicalDevice*                   pLogicalDevice;
+        std::vector<VkImage>             inputImages;
+        std::vector<VkImage>             outputImages;
+        std::vector<VkImageView>         inputImageViewsSRGB;
+        std::vector<VkImageView>         inputImageViewsUNORM;
+        std::vector<VkImageView>         outputImageViewsSRGB;
+        std::vector<VkImageView>         outputImageViewsUNORM;
 
         std::unordered_map<std::string, std::vector<VkImage>>     textureImages;
         std::unordered_map<std::string, std::vector<VkImageView>> textureImageViewsUNORM;
@@ -98,12 +89,12 @@ namespace vkBasalt
 
         std::vector<std::shared_ptr<ReshadeUniform>> uniforms;
 
-        void          createReshadeModule();
-        VkFormat      convertReshadeFormat(reshadefx::texture_format texFormat);
-        VkCompareOp   convertReshadeCompareOp(reshadefx::stencil_func compareOp);
-        VkStencilOp   convertReshadeStencilOp(reshadefx::stencil_op stencilOp);
-        VkBlendOp     convertReshadeBlendOp(reshadefx::blend_op blendOp);
-        VkBlendFactor convertReshadeBlendFactor(reshadefx::blend_factor blendFactor);
+        void createReshadeModule();
+        auto convertReshadeFormat(reshadefx::texture_format texFormat) -> VkFormat;
+        auto convertReshadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp;
+        auto convertReshadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp;
+        auto convertReshadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp;
+        auto convertReshadeBlendFactor(reshadefx::blend_factor blendFactor) -> VkBlendFactor;
     };
 } // namespace vkBasalt
 

@@ -1,13 +1,15 @@
 #include "image_view.hpp"
+#include "vulkan_include.hpp"
 
 namespace vkBasalt
 {
-    std::vector<VkImageView> createImageViews(LogicalDevice*       pLogicalDevice,
-                                              VkFormat             format,
-                                              std::vector<VkImage> images,
-                                              VkImageViewType      viewType,
-                                              VkImageAspectFlags   aspectMask,
-                                              uint32_t             mipLevels)
+    auto createImageViews(const vkroots::VkDeviceDispatch* pDispatch,
+                          LogicalDevice*                   pLogicalDevice,
+                          VkFormat                         format,
+                          std::vector<VkImage>             images,
+                          VkImageViewType                  viewType,
+                          VkImageAspectFlags               aspectMask,
+                          uint32_t                         mipLevels) -> std::vector<VkImageView>
     {
         std::vector<VkImageView> imageViews(images.size());
 
@@ -33,7 +35,7 @@ namespace vkBasalt
         for (uint32_t i = 0; i < images.size(); i++)
         {
             imageViewCreateInfo.image = images[i];
-            VkResult result           = pLogicalDevice->vkd->CreateImageView(pLogicalDevice->device, &imageViewCreateInfo, nullptr, &(imageViews[i]));
+            VkResult result           = pDispatch->CreateImageView(pLogicalDevice->device, &imageViewCreateInfo, nullptr, &(imageViews[i]));
             ASSERT_VULKAN(result);
         }
 

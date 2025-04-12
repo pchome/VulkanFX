@@ -2,7 +2,7 @@
 
 namespace vkBasalt
 {
-    VkFormat convertToSRGB(VkFormat format)
+    auto convertToSRGB(VkFormat format) -> VkFormat
     {
         switch (format)
         {
@@ -44,7 +44,7 @@ namespace vkBasalt
         }
     }
 
-    VkFormat convertToUNORM(VkFormat format)
+    auto convertToUNORM(VkFormat format) -> VkFormat
     {
         switch (format)
         {
@@ -84,22 +84,27 @@ namespace vkBasalt
         }
     }
 
-    bool isSRGB(VkFormat format)
+    auto isSRGB(VkFormat format) -> bool
     {
         return convertToUNORM(format) != format;
     }
 
-    bool isUNORM(VkFormat format)
+    auto isUNORM(VkFormat format) -> bool
     {
         return convertToSRGB(format) != format;
     }
 
-    VkFormat getSupportedFormat(LogicalDevice* pLogicalDevice, std::vector<VkFormat> formats, VkFormatFeatureFlags features, VkImageTiling tiling)
+    auto getSupportedFormat(const vkroots::VkDeviceDispatch* pDispatch,
+                            LogicalDevice*                   pLogicalDevice,
+                            std::vector<VkFormat>            formats,
+                            VkFormatFeatureFlags             features,
+                            VkImageTiling                    tiling) -> VkFormat
     {
         for (auto& format : formats)
         {
             VkFormatProperties properties;
-            pLogicalDevice->vki->GetPhysicalDeviceFormatProperties(pLogicalDevice->physicalDevice, format, &properties);
+            pDispatch->pPhysicalDeviceDispatch->pInstanceDispatch->GetPhysicalDeviceFormatProperties(
+                pLogicalDevice->physicalDevice, format, &properties);
             if ((properties.optimalTilingFeatures & features) == features && tiling == VK_IMAGE_TILING_OPTIMAL)
             {
                 return format;
@@ -113,33 +118,33 @@ namespace vkBasalt
         return VK_FORMAT_UNDEFINED;
     }
 
-    VkFormat getStencilFormat(LogicalDevice* pLogicalDevice)
+    auto getStencilFormat(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice) -> VkFormat
     {
         std::vector<VkFormat> stencilFormats = {VK_FORMAT_D24_UNORM_S8_UINT, VK_FORMAT_D32_SFLOAT_S8_UINT};
-        return getSupportedFormat(pLogicalDevice, stencilFormats, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+        return getSupportedFormat(pDispatch, pLogicalDevice, stencilFormats, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
     }
 
-    bool isDepthFormat(VkFormat format)
+    auto isDepthFormat(VkFormat format) -> bool
     {
         switch (format)
         {
-            case VK_FORMAT_D16_UNORM: return true;
-            case VK_FORMAT_X8_D24_UNORM_PACK32: return true;
-            case VK_FORMAT_D32_SFLOAT: return true;
-            case VK_FORMAT_D16_UNORM_S8_UINT: return true;
-            case VK_FORMAT_D24_UNORM_S8_UINT: return true;
+            case VK_FORMAT_D16_UNORM:
+            case VK_FORMAT_X8_D24_UNORM_PACK32:
+            case VK_FORMAT_D32_SFLOAT:
+            case VK_FORMAT_D16_UNORM_S8_UINT:
+            case VK_FORMAT_D24_UNORM_S8_UINT:
             case VK_FORMAT_D32_SFLOAT_S8_UINT: return true;
             default: return false;
         }
     }
 
-    bool isStencilFormat(VkFormat format)
+    auto isStencilFormat(VkFormat format) -> bool
     {
         switch (format)
         {
-            case VK_FORMAT_S8_UINT: return true;
-            case VK_FORMAT_D16_UNORM_S8_UINT: return true;
-            case VK_FORMAT_D24_UNORM_S8_UINT: return true;
+            case VK_FORMAT_S8_UINT:
+            case VK_FORMAT_D16_UNORM_S8_UINT:
+            case VK_FORMAT_D24_UNORM_S8_UINT:
             case VK_FORMAT_D32_SFLOAT_S8_UINT: return true;
             default: return false;
         }

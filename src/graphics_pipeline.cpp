@@ -2,7 +2,9 @@
 
 namespace vkBasalt
 {
-    VkPipelineLayout createGraphicsPipelineLayout(LogicalDevice* pLogicalDevice, std::vector<VkDescriptorSetLayout> descriptorSetLayouts)
+    auto createGraphicsPipelineLayout(const vkroots::VkDeviceDispatch*   pDispatch,
+                                      LogicalDevice*                     pLogicalDevice,
+                                      std::vector<VkDescriptorSetLayout> descriptorSetLayouts) -> VkPipelineLayout
     {
         VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
         pipelineLayoutCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -14,22 +16,23 @@ namespace vkBasalt
         pipelineLayoutCreateInfo.pPushConstantRanges    = nullptr;
 
         VkPipelineLayout pipelineLayout;
-        VkResult result = pLogicalDevice->vkd->CreatePipelineLayout(pLogicalDevice->device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout);
+        VkResult         result = pDispatch->CreatePipelineLayout(pLogicalDevice->device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout);
         ASSERT_VULKAN(result);
         return pipelineLayout;
     }
 
-    VkPipeline createGraphicsPipeline(LogicalDevice*        pLogicalDevice,
-                                      VkShaderModule        vertexModule,
-                                      VkSpecializationInfo* vertexSpecializationInfo,
-                                      std::string           vertexEntryPoint,
-                                      VkShaderModule        fragmentModule,
-                                      VkSpecializationInfo* fragmentSpecializationInfo,
-                                      std::string           fragmentEntryPoint,
-                                      VkExtent2D            extent,
-                                      VkRenderPass          renderPass,
-                                      VkPipelineLayout      pipelineLayout,
-                                      bool                  flip)
+    auto createGraphicsPipeline(const vkroots::VkDeviceDispatch* pDispatch,
+                                LogicalDevice*                   pLogicalDevice,
+                                VkShaderModule                   vertexModule,
+                                VkSpecializationInfo*            vertexSpecializationInfo,
+                                std::string                      vertexEntryPoint,
+                                VkShaderModule                   fragmentModule,
+                                VkSpecializationInfo*            fragmentSpecializationInfo,
+                                std::string                      fragmentEntryPoint,
+                                VkExtent2D                       extent,
+                                VkRenderPass                     renderPass,
+                                VkPipelineLayout                 pipelineLayout,
+                                bool                             flip) -> VkPipeline
     {
         VkResult result;
 
@@ -173,7 +176,7 @@ namespace vkBasalt
         pipelineCreateInfo.basePipelineHandle  = VK_NULL_HANDLE;
         pipelineCreateInfo.basePipelineIndex   = -1;
 
-        result = pLogicalDevice->vkd->CreateGraphicsPipelines(pLogicalDevice->device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
+        result = pDispatch->CreateGraphicsPipelines(pLogicalDevice->device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &pipeline);
         ASSERT_VULKAN(result);
 
         return pipeline;

@@ -2,8 +2,11 @@
 
 namespace vkBasalt
 {
-    std::vector<VkFramebuffer>
-    createFramebuffers(LogicalDevice* pLogicalDevice, VkRenderPass renderPass, VkExtent2D& extent, std::vector<std::vector<VkImageView>> imageViews)
+    auto createFramebuffers(const vkroots::VkDeviceDispatch*      pDispatch,
+                            LogicalDevice*                        pLogicalDevice,
+                            VkRenderPass                          renderPass,
+                            VkExtent2D&                           extent,
+                            std::vector<std::vector<VkImageView>> imageViews) -> std::vector<VkFramebuffer>
     {
         std::vector<VkFramebuffer> framebuffers(imageViews[0].size());
         std::vector<VkImageView>   perFrameImageViews;
@@ -25,7 +28,7 @@ namespace vkBasalt
             framebufferCreateInfo.height          = extent.height;
             framebufferCreateInfo.layers          = 1;
 
-            VkResult result = pLogicalDevice->vkd->CreateFramebuffer(pLogicalDevice->device, &framebufferCreateInfo, nullptr, &(framebuffers[i]));
+            VkResult result = pDispatch->CreateFramebuffer(pLogicalDevice->device, &framebufferCreateInfo, nullptr, &(framebuffers[i]));
             ASSERT_VULKAN(result);
             perFrameImageViews.clear();
         }

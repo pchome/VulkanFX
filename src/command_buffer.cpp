@@ -5,7 +5,8 @@
 
 namespace vkBasalt
 {
-    std::vector<VkCommandBuffer> allocateCommandBuffer(LogicalDevice* pLogicalDevice, uint32_t count)
+    auto allocateCommandBuffer(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count)
+        -> std::vector<VkCommandBuffer>
     {
         std::vector<VkCommandBuffer> commandBuffers(count);
 
@@ -16,7 +17,7 @@ namespace vkBasalt
         allocInfo.commandPool        = pLogicalDevice->commandPool;
         allocInfo.commandBufferCount = count;
 
-        VkResult result = pLogicalDevice->vkd->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, commandBuffers.data());
+        VkResult result = pDispatch->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, commandBuffers.data());
         ASSERT_VULKAN(result);
         for (uint32_t i = 0; i < count; i++)
         {
@@ -26,7 +27,8 @@ namespace vkBasalt
 
         return commandBuffers;
     }
-    void writeCommandBuffers(LogicalDevice*                                 pLogicalDevice,
+    void writeCommandBuffers(const vkroots::VkDeviceDispatch*               pDispatch,
+                             LogicalDevice*                                 pLogicalDevice,
                              std::vector<std::shared_ptr<vkBasalt::Effect>> effects,
                              VkImage                                        depthImage,
                              VkImageView                                    depthImageView,
@@ -42,13 +44,13 @@ namespace vkBasalt
 
         for (auto& effect : effects)
         {
-            effect->useDepthImage(depthImageView);
+            effect->useDepthImage(pDispatch, depthImageView);
         }
 
         for (uint32_t i = 0; i < commandBuffers.size(); i++)
         {
 
-            VkResult result = pLogicalDevice->vkd->BeginCommandBuffer(commandBuffers[i], &beginInfo);
+            VkResult result = pDispatch->BeginCommandBuffer(commandBuffers[i], &beginInfo);
             ASSERT_VULKAN(result);
 
             VkImageMemoryBarrier memoryBarrier;
@@ -70,22 +72,22 @@ namespace vkBasalt
 
             if (depthImageView)
             {
-                pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffers[i],
-                                                       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                                                       VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-                                                       0,
-                                                       0,
-                                                       nullptr,
-                                                       0,
-                                                       nullptr,
-                                                       1,
-                                                       &memoryBarrier);
+                pDispatch->CmdPipelineBarrier(commandBuffers[i],
+                                              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                              VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+                                              0,
+                                              0,
+                                              nullptr,
+                                              0,
+                                              nullptr,
+                                              1,
+                                              &memoryBarrier);
             }
 
             for (uint32_t j = 0; j < effects.size(); j++)
             {
                 Logger::debug("before applying effect " + convertToString(effects[j]));
-                effects[j]->applyEffect(i, commandBuffers[i]);
+                effects[j]->applyEffect(pDispatch, i, commandBuffers[i]);
             }
 
             memoryBarrier.oldLayout     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -93,24 +95,24 @@ namespace vkBasalt
             memoryBarrier.dstAccessMask = 0;
             if (depthImageView)
             {
-                pLogicalDevice->vkd->CmdPipelineBarrier(commandBuffers[i],
-                                                       VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                                                       VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-                                                       0,
-                                                       0,
-                                                       nullptr,
-                                                       0,
-                                                       nullptr,
-                                                       1,
-                                                       &memoryBarrier);
+                pDispatch->CmdPipelineBarrier(commandBuffers[i],
+                                              VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                                              VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
+                                              0,
+                                              0,
+                                              nullptr,
+                                              0,
+                                              nullptr,
+                                              1,
+                                              &memoryBarrier);
             }
 
-            result = pLogicalDevice->vkd->EndCommandBuffer(commandBuffers[i]);
+            result = pDispatch->EndCommandBuffer(commandBuffers[i]);
             ASSERT_VULKAN(result);
         }
     }
 
-    std::vector<VkSemaphore> createSemaphores(LogicalDevice* pLogicalDevice, uint32_t count)
+    auto createSemaphores(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count) -> std::vector<VkSemaphore>
     {
         std::vector<VkSemaphore> semaphores(count);
         VkSemaphoreCreateInfo    info;
@@ -120,7 +122,7 @@ namespace vkBasalt
 
         for (uint32_t i = 0; i < count; i++)
         {
-            pLogicalDevice->vkd->CreateSemaphore(pLogicalDevice->device, &info, nullptr, &semaphores[i]);
+            pDispatch->CreateSemaphore(pLogicalDevice->device, &info, nullptr, &semaphores[i]);
         }
         return semaphores;
     }

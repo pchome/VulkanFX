@@ -1,17 +1,10 @@
+#pragma once
 #ifndef LOGICAL_SWAPCHAIN_HPP_INCLUDED
 #define LOGICAL_SWAPCHAIN_HPP_INCLUDED
 #include <vector>
-#include <fstream>
-#include <string>
-#include <iostream>
-#include <vector>
 #include <memory>
-
 #include "effect.hpp"
 
-#include "vulkan_include.hpp"
-
-#include "logical_device.hpp"
 
 namespace vkBasalt
 {
@@ -32,7 +25,7 @@ namespace vkBasalt
         std::shared_ptr<Effect>              defaultTransfer;
         VkDeviceMemory                       fakeImageMemory;
 
-        void destroy();
+        void destroy(const vkroots::VkDeviceDispatch* pDispatch);
     };
 } // namespace vkBasalt
 

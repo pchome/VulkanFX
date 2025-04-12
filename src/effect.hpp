@@ -1,12 +1,6 @@
+#pragma once
 #ifndef EFFECT_HPP_INCLUDED
 #define EFFECT_HPP_INCLUDED
-#include <vector>
-#include <fstream>
-#include <string>
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
 #include "vulkan_include.hpp"
 
 namespace vkBasalt
@@ -14,10 +8,10 @@ namespace vkBasalt
     class Effect
     {
     public:
-        void virtual applyEffect(uint32_t imageIndex, VkCommandBuffer commandBuffer) = 0;
-        void virtual updateEffect(){};
-        void virtual useDepthImage(VkImageView depthImageView){};
-        virtual ~Effect(){};
+        void virtual applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer) = 0;
+        void virtual updateEffect(const vkroots::VkDeviceDispatch* pDispatch){};
+        void virtual useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView){};
+        virtual ~Effect() {};
 
     private:
     };
