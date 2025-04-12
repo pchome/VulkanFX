@@ -1,8 +1,6 @@
+#pragma once
 #ifndef LOGGER_HPP_INCLUDED
 #define LOGGER_HPP_INCLUDED
-
-#include <array>
-#include <fstream>
 #include <iostream>
 #include <mutex>
 #include <string>
@@ -36,7 +34,7 @@ namespace vkBasalt
         static void err(const std::string& message);
         static void log(LogLevel level, const std::string& message);
 
-        static LogLevel logLevel()
+        static auto logLevel() -> LogLevel
         {
             return s_instance.m_minLevel;
         }
@@ -52,9 +50,9 @@ namespace vkBasalt
 
         void emitMsg(LogLevel level, const std::string& message);
 
-        static LogLevel getMinLogLevel();
+        static auto getMinLogLevel() -> LogLevel;
 
-        static std::string getFileName();
+        static auto getFileName() -> std::string;
     };
 
 } // namespace vkBasalt

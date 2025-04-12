@@ -2,7 +2,7 @@
 
 namespace vkBasalt
 {
-    VkSampler createSampler(LogicalDevice* pLogicalDevice)
+    auto createSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice) -> VkSampler
     {
         VkSampler sampler;
 
@@ -26,13 +26,14 @@ namespace vkBasalt
         samplerCreateInfo.borderColor             = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
         samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
 
-        VkResult result = pLogicalDevice->vkd->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
+        VkResult result = pDispatch->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
         ASSERT_VULKAN(result);
         return sampler;
     }
 
 #if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
-    VkSampler createReshadeSampler(LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
+    auto createReshadeSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
+        -> VkSampler
     {
         VkSampler sampler;
 
@@ -61,12 +62,12 @@ namespace vkBasalt
         samplerCreateInfo.borderColor             = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
         samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
 
-        VkResult result = pLogicalDevice->vkd->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
+        VkResult result = pDispatch->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
         ASSERT_VULKAN(result);
         return sampler;
     }
 
-    VkSamplerAddressMode convertReshadeAddressMode(const reshadefx::texture_address_mode& addressMode)
+    auto convertReshadeAddressMode(const reshadefx::texture_address_mode& addressMode) -> VkSamplerAddressMode
     {
         switch (addressMode)
         {
@@ -78,8 +79,7 @@ namespace vkBasalt
         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
     }
 
-    void
-    convertReshadeFilter(const reshadefx::filter_mode& textureFilter, VkFilter& minFilter, VkFilter& magFilter, VkSamplerMipmapMode& mipmapMode)
+    void convertReshadeFilter(const reshadefx::filter_mode& textureFilter, VkFilter& minFilter, VkFilter& magFilter, VkSamplerMipmapMode& mipmapMode)
     {
         switch (textureFilter)
         {
@@ -129,8 +129,8 @@ namespace vkBasalt
                 magFilter  = VK_FILTER_LINEAR;
                 mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
                 return;
-            // TODO: check (and maybe use) reshade::vulkan::convert_sampler_desc
-            // source/vulkan/vulkan_impl_type_convert.hpp
+                // TODO: check (and maybe use) reshade::vulkan::convert_sampler_desc
+                // source/vulkan/vulkan_impl_type_convert.hpp
         }
     }
 #endif

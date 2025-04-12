@@ -5,14 +5,15 @@
 
 namespace vkBasalt
 {
-    std::vector<VkImage> createImages(LogicalDevice*        pLogicalDevice,
-                                      uint32_t              count,
-                                      VkExtent3D            extent,
-                                      VkFormat              format,
-                                      VkImageUsageFlags     usage,
-                                      VkMemoryPropertyFlags properties,
-                                      VkDeviceMemory&       imageMemory,
-                                      uint32_t              mipLevels)
+    auto createImages(const vkroots::VkDeviceDispatch* pDispatch,
+                      LogicalDevice*                   pLogicalDevice,
+                      uint32_t                         count,
+                      VkExtent3D                       extent,
+                      VkFormat                         format,
+                      VkImageUsageFlags                usage,
+                      VkMemoryPropertyFlags            properties,
+                      VkDeviceMemory&                  imageMemory,
+                      uint32_t                         mipLevels) -> std::vector<VkImage>
     {
         std::vector<VkImage> images(count);
 
@@ -54,12 +55,12 @@ namespace vkBasalt
         VkResult result;
         for (uint32_t i = 0; i < count; i++)
         {
-            result = pLogicalDevice->vkd->CreateImage(pLogicalDevice->device, &imageCreateInfo, nullptr, &(images[i]));
+            result = pDispatch->CreateImage(pLogicalDevice->device, &imageCreateInfo, nullptr, &(images[i]));
             ASSERT_VULKAN(result);
         }
         // Allocate a bunch of memory for all images at one
         VkMemoryRequirements memoryRequirements;
-        pLogicalDevice->vkd->GetImageMemoryRequirements(pLogicalDevice->device, images[0], &memoryRequirements);
+        pDispatch->GetImageMemoryRequirements(pLogicalDevice->device, images[0], &memoryRequirements);
 
         if (memoryRequirements.size % memoryRequirements.alignment != 0)
         {
@@ -70,37 +71,43 @@ namespace vkBasalt
         memoryAllocateInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memoryAllocateInfo.pNext           = nullptr;
         memoryAllocateInfo.allocationSize  = memoryRequirements.size * count;
-        memoryAllocateInfo.memoryTypeIndex = findMemoryTypeIndex(pLogicalDevice, memoryRequirements.memoryTypeBits, properties);
+        memoryAllocateInfo.memoryTypeIndex = findMemoryTypeIndex(pDispatch, pLogicalDevice, memoryRequirements.memoryTypeBits, properties);
 
-        result = pLogicalDevice->vkd->AllocateMemory(pLogicalDevice->device, &memoryAllocateInfo, nullptr, &imageMemory);
+        result = pDispatch->AllocateMemory(pLogicalDevice->device, &memoryAllocateInfo, nullptr, &imageMemory);
         ASSERT_VULKAN(result);
 
         for (uint32_t i = 0; i < count; i++)
         {
-            result = pLogicalDevice->vkd->BindImageMemory(pLogicalDevice->device, images[i], imageMemory, memoryRequirements.size * i);
+            result = pDispatch->BindImageMemory(pLogicalDevice->device, images[i], imageMemory, memoryRequirements.size * i);
             ASSERT_VULKAN(result);
         }
         return images;
     }
 
-    void
-    uploadToImage(LogicalDevice* pLogicalDevice, VkImage image, VkExtent3D extent, uint32_t size, const unsigned char* writeData, uint32_t mipLevels)
+    void uploadToImage(const vkroots::VkDeviceDispatch* pDispatch,
+                       LogicalDevice*                   pLogicalDevice,
+                       VkImage                          image,
+                       VkExtent3D                       extent,
+                       uint32_t                         size,
+                       const unsigned char*             writeData,
+                       uint32_t                         mipLevels)
     {
 
         VkBuffer       stagingBuffer;
         VkDeviceMemory stagingMemory;
 
-        createBuffer(pLogicalDevice,
+        createBuffer(pDispatch,
+                     pLogicalDevice,
                      size,
                      VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                      stagingBuffer,
                      stagingMemory);
         void*    data;
-        VkResult result = pLogicalDevice->vkd->MapMemory(pLogicalDevice->device, stagingMemory, 0, size, 0, &data);
+        VkResult result = pDispatch->MapMemory(pLogicalDevice->device, stagingMemory, 0, size, 0, &data);
         ASSERT_VULKAN(result);
         std::memcpy(data, writeData, size);
-        pLogicalDevice->vkd->UnmapMemory(pLogicalDevice->device, stagingMemory);
+        pDispatch->UnmapMemory(pLogicalDevice->device, stagingMemory);
 
         VkCommandBufferAllocateInfo allocInfo = {};
 
@@ -110,7 +117,7 @@ namespace vkBasalt
         allocInfo.commandBufferCount = 1;
 
         VkCommandBuffer commandBuffer;
-        pLogicalDevice->vkd->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, &commandBuffer);
+        pDispatch->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, &commandBuffer);
         // initialize dispatch table for commandBuffer since it is a dispatchable object
         initializeDispatchTable(commandBuffer, pLogicalDevice->device);
 
@@ -119,7 +126,7 @@ namespace vkBasalt
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-        pLogicalDevice->vkd->BeginCommandBuffer(commandBuffer, &beginInfo);
+        pDispatch->BeginCommandBuffer(commandBuffer, &beginInfo);
 
         VkImageMemoryBarrier memoryBarrier;
         memoryBarrier.sType                           = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -137,7 +144,7 @@ namespace vkBasalt
         memoryBarrier.subresourceRange.baseArrayLayer = 0;
         memoryBarrier.subresourceRange.layerCount     = 1;
 
-        pLogicalDevice->vkd->CmdPipelineBarrier(
+        pDispatch->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
         VkBufferImageCopy region;
@@ -151,19 +158,19 @@ namespace vkBasalt
         region.imageOffset                     = {0, 0, 0};
         region.imageExtent                     = extent;
 
-        pLogicalDevice->vkd->CmdCopyBufferToImage(commandBuffer, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+        pDispatch->CmdCopyBufferToImage(commandBuffer, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
         memoryBarrier.oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         memoryBarrier.newLayout     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         memoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-        pLogicalDevice->vkd->CmdPipelineBarrier(
+        pDispatch->CmdPipelineBarrier(
             commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
-        generateMipMaps(pLogicalDevice, commandBuffer, image, extent, mipLevels);
+        generateMipMaps(pDispatch, pLogicalDevice, commandBuffer, image, extent, mipLevels);
 
-        pLogicalDevice->vkd->EndCommandBuffer(commandBuffer);
+        pDispatch->EndCommandBuffer(commandBuffer);
 
         VkSubmitInfo submitInfo = {};
 
@@ -171,15 +178,15 @@ namespace vkBasalt
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers    = &commandBuffer;
 
-        pLogicalDevice->vkd->QueueSubmit(pLogicalDevice->queue, 1, &submitInfo, VK_NULL_HANDLE);
-        pLogicalDevice->vkd->QueueWaitIdle(pLogicalDevice->queue);
+        pDispatch->QueueSubmit(pLogicalDevice->queue, 1, &submitInfo, VK_NULL_HANDLE);
+        pDispatch->QueueWaitIdle(pLogicalDevice->queue);
 
-        pLogicalDevice->vkd->FreeCommandBuffers(pLogicalDevice->device, pLogicalDevice->commandPool, 1, &commandBuffer);
-        pLogicalDevice->vkd->FreeMemory(pLogicalDevice->device, stagingMemory, nullptr);
-        pLogicalDevice->vkd->DestroyBuffer(pLogicalDevice->device, stagingBuffer, nullptr);
+        pDispatch->FreeCommandBuffers(pLogicalDevice->device, pLogicalDevice->commandPool, 1, &commandBuffer);
+        pDispatch->FreeMemory(pLogicalDevice->device, stagingMemory, nullptr);
+        pDispatch->DestroyBuffer(pLogicalDevice->device, stagingBuffer, nullptr);
     }
 
-    void changeImageLayout(LogicalDevice* pLogicalDevice, std::vector<VkImage> images, uint32_t mipLevels)
+    void changeImageLayout(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, std::vector<VkImage> images, uint32_t mipLevels)
     {
         VkCommandBufferAllocateInfo allocInfo = {};
 
@@ -189,7 +196,7 @@ namespace vkBasalt
         allocInfo.commandBufferCount = 1;
 
         VkCommandBuffer commandBuffer;
-        pLogicalDevice->vkd->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, &commandBuffer);
+        pDispatch->AllocateCommandBuffers(pLogicalDevice->device, &allocInfo, &commandBuffer);
         // initialize dispatch table for commandBuffer since it is a dispatchable object
         initializeDispatchTable(commandBuffer, pLogicalDevice->device);
 
@@ -198,7 +205,7 @@ namespace vkBasalt
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
         beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-        pLogicalDevice->vkd->BeginCommandBuffer(commandBuffer, &beginInfo);
+        pDispatch->BeginCommandBuffer(commandBuffer, &beginInfo);
 
         VkImageMemoryBarrier memoryBarrier;
         memoryBarrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -219,24 +226,29 @@ namespace vkBasalt
         for (auto& image : images)
         {
             memoryBarrier.image = image;
-            pLogicalDevice->vkd->CmdPipelineBarrier(
+            pDispatch->CmdPipelineBarrier(
                 commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         }
 
-        pLogicalDevice->vkd->EndCommandBuffer(commandBuffer);
+        pDispatch->EndCommandBuffer(commandBuffer);
 
         VkSubmitInfo submitInfo       = {};
         submitInfo.sType              = VK_STRUCTURE_TYPE_SUBMIT_INFO;
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers    = &commandBuffer;
 
-        pLogicalDevice->vkd->QueueSubmit(pLogicalDevice->queue, 1, &submitInfo, VK_NULL_HANDLE);
-        pLogicalDevice->vkd->QueueWaitIdle(pLogicalDevice->queue);
+        pDispatch->QueueSubmit(pLogicalDevice->queue, 1, &submitInfo, VK_NULL_HANDLE);
+        pDispatch->QueueWaitIdle(pLogicalDevice->queue);
 
-        pLogicalDevice->vkd->FreeCommandBuffers(pLogicalDevice->device, pLogicalDevice->commandPool, 1, &commandBuffer);
+        pDispatch->FreeCommandBuffers(pLogicalDevice->device, pLogicalDevice->commandPool, 1, &commandBuffer);
     }
 
-    void generateMipMaps(LogicalDevice* pLogicalDevice, VkCommandBuffer commandBuffer, VkImage image, VkExtent3D extent, uint32_t mipLevels)
+    void generateMipMaps(const vkroots::VkDeviceDispatch* pDispatch,
+                         LogicalDevice*                   pLogicalDevice,
+                         VkCommandBuffer                  commandBuffer,
+                         VkImage                          image,
+                         VkExtent3D                       extent,
+                         uint32_t                         mipLevels)
     {
         if (mipLevels < 2)
         {
@@ -292,7 +304,7 @@ namespace vkBasalt
             memoryBarrier.srcAccessMask = 0;
             memoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
 
-            pLogicalDevice->vkd->CmdPipelineBarrier(
+            pDispatch->CmdPipelineBarrier(
                 commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
             memoryBarrier.subresourceRange.baseMipLevel = i;
@@ -302,17 +314,17 @@ namespace vkBasalt
             memoryBarrier.srcAccessMask = 0;
             memoryBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 
-            pLogicalDevice->vkd->CmdPipelineBarrier(
+            pDispatch->CmdPipelineBarrier(
                 commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
-            pLogicalDevice->vkd->CmdBlitImage(commandBuffer,
-                                             image,
-                                             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                                             image,
-                                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                             1,
-                                             &imageBlit,
-                                             VK_FILTER_LINEAR);
+            pDispatch->CmdBlitImage(commandBuffer,
+                                    image,
+                                    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                                    image,
+                                    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                    1,
+                                    &imageBlit,
+                                    VK_FILTER_LINEAR);
 
             memoryBarrier.subresourceRange.baseMipLevel = i - 1;
 
@@ -321,7 +333,7 @@ namespace vkBasalt
             memoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
             memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-            pLogicalDevice->vkd->CmdPipelineBarrier(
+            pDispatch->CmdPipelineBarrier(
                 commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
 
             memoryBarrier.subresourceRange.baseMipLevel = i;
@@ -331,7 +343,7 @@ namespace vkBasalt
             memoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
             memoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-            pLogicalDevice->vkd->CmdPipelineBarrier(
+            pDispatch->CmdPipelineBarrier(
                 commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         }
     }

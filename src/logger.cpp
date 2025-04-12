@@ -1,7 +1,7 @@
 #include "logger.hpp"
 
 #include <cstdlib>
-
+#include <fstream>
 #include <sstream>
 
 namespace vkBasalt
@@ -83,7 +83,7 @@ namespace vkBasalt
         }
     }
 
-    LogLevel Logger::getMinLogLevel()
+    auto Logger::getMinLogLevel() -> LogLevel
     {
         const std::array<std::pair<const char*, LogLevel>, 6> logLevels = {{
             {"trace", LogLevel::Trace},
@@ -94,7 +94,7 @@ namespace vkBasalt
             {"none", LogLevel::None},
         }};
 
-        const char* envVar = getenv("VKBASALT_LOG_LEVEL");
+        const char* envVar = std::getenv("VKBASALT_LOG_LEVEL");
 
         const std::string logLevelStr = envVar ? envVar : "";
 
@@ -107,9 +107,9 @@ namespace vkBasalt
         return LogLevel::Info;
     }
 
-    std::string Logger::getFileName()
+    auto Logger::getFileName() -> std::string
     {
-        const char* envVar = getenv("VKBASALT_LOG_FILE");
+        const char* envVar = std::getenv("VKBASALT_LOG_FILE");
 
         std::string filename = envVar ? envVar : "";
 

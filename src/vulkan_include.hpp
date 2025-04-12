@@ -1,13 +1,11 @@
+#pragma once
 #ifndef VULKAN_INCLUDE_HPP_INCLUDED
 #define VULKAN_INCLUDE_HPP_INCLUDED
 
 #define VK_NO_PROTOTYPES
 
 #pragma GCC system_header
-#include "vulkan/vulkan.h"
-#include "vulkan/vk_layer.h"
-
-#include <string>
+#include <vkroots.h>
 
 #include "logger.hpp"
 
@@ -18,8 +16,23 @@
         Logger::err("ASSERT_VULKAN failed in " + std::string(__FILE__) + " : " + std::to_string(__LINE__) + "; " + std::to_string(val)); \
     }
 #endif
+
 namespace vkBasalt
 {
+    struct LogicalDevice
+    {
+        VkDevice                 device;
+        VkPhysicalDevice         physicalDevice;
+        VkInstance               instance;
+        VkQueue                  queue;
+        uint32_t                 queueFamilyIndex;
+        VkCommandPool            commandPool;
+        bool                     supportsMutableFormat;
+        std::vector<VkImage>     depthImages;
+        std::vector<VkFormat>    depthFormats;
+        std::vector<VkImageView> depthImageViews;
+    };
+
     template<typename DispatchableType, typename SuperDispatchableType>
     inline void initializeDispatchTable(DispatchableType dispatchableObject, SuperDispatchableType source)
     {

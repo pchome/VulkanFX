@@ -1,6 +1,6 @@
 #include "config.hpp"
 #include "config_paths.hpp"
-
+#include "logger.hpp"
 #include <sstream>
 #include <locale>
 

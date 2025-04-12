@@ -2,20 +2,11 @@
 
 #include <cstring>
 
-#include "image_view.hpp"
-#include "descriptor_set.hpp"
-#include "buffer.hpp"
-#include "renderpass.hpp"
-#include "graphics_pipeline.hpp"
-#include "framebuffer.hpp"
-#include "shader.hpp"
-#include "sampler.hpp"
-
 #include "shader_sources.hpp"
 
 namespace vkBasalt
 {
-    DebandEffect::DebandEffect(LogicalDevice*       pLogicalDevice,
+    DebandEffect::DebandEffect(const vkroots::VkDeviceDispatch* pDispatch,LogicalDevice*       pLogicalDevice,
                                VkFormat             format,
                                VkExtent2D           imageExtent,
                                std::vector<VkImage> inputImages,
@@ -67,7 +58,7 @@ namespace vkBasalt
         pVertexSpecInfo   = nullptr;
         pFragmentSpecInfo = &specializationInfo;
 
-        init(pLogicalDevice, format, imageExtent, inputImages, outputImages, pConfig);
+        init(pDispatch, pLogicalDevice, format, imageExtent, inputImages, outputImages, pConfig);
     }
     DebandEffect::~DebandEffect()
     {

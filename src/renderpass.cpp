@@ -2,7 +2,7 @@
 
 namespace vkBasalt
 {
-    VkRenderPass createRenderPass(LogicalDevice* pLogicalDevice, VkFormat format)
+    VkRenderPass createRenderPass(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, VkFormat format)
     {
         VkRenderPass renderPass;
 
@@ -53,7 +53,7 @@ namespace vkBasalt
         renderPassCreateInfo.dependencyCount = 1;
         renderPassCreateInfo.pDependencies   = &subpassDependency;
 
-        VkResult result = pLogicalDevice->vkd->CreateRenderPass(pLogicalDevice->device, &renderPassCreateInfo, nullptr, &renderPass);
+        VkResult result = pDispatch->CreateRenderPass(pLogicalDevice->device, &renderPassCreateInfo, nullptr, &renderPass);
         ASSERT_VULKAN(result);
 
         return renderPass;

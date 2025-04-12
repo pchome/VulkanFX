@@ -1,26 +1,17 @@
-#include "effect_cas.hpp"
-
 #include <cstring>
-
-#include "image_view.hpp"
-#include "descriptor_set.hpp"
-#include "buffer.hpp"
-#include "renderpass.hpp"
-#include "graphics_pipeline.hpp"
-#include "framebuffer.hpp"
-#include "shader.hpp"
-#include "sampler.hpp"
+#include "effect_cas.hpp"
 
 #include "shader_sources.hpp"
 
 namespace vkBasalt
 {
-    CasEffect::CasEffect(LogicalDevice*       pLogicalDevice,
-                         VkFormat             format,
-                         VkExtent2D           imageExtent,
-                         std::vector<VkImage> inputImages,
-                         std::vector<VkImage> outputImages,
-                         Config*              pConfig)
+    CasEffect::CasEffect(const vkroots::VkDeviceDispatch* pDispatch,
+                         LogicalDevice*                   pLogicalDevice,
+                         VkFormat                         format,
+                         VkExtent2D                       imageExtent,
+                         std::vector<VkImage>             inputImages,
+                         std::vector<VkImage>             outputImages,
+                         Config*                          pConfig)
     {
 
         float sharpness = pConfig->getOption<float>("casSharpness", 0.4f);
@@ -42,7 +33,7 @@ namespace vkBasalt
         pVertexSpecInfo   = nullptr;
         pFragmentSpecInfo = &fragmentSpecializationInfo;
 
-        init(pLogicalDevice, format, imageExtent, inputImages, outputImages, pConfig);
+        init(pDispatch, pLogicalDevice, format, imageExtent, inputImages, outputImages, pConfig);
     }
     CasEffect::~CasEffect()
     {
