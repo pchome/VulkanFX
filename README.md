@@ -18,54 +18,71 @@ This is one of my first projects ever, so expect it to have bugs. Use it at your
 ### Dependencies
 Before building, you will need:
 - GCC >= 9
-- X11 development files
-- glslang
-- SPIR-V Headers
-- Vulkan Headers
+- x11-libs/libX11
+- dev-util/glslang
+- dev-util/spirv-headers
+- dev-util/vulkan-headers
+- dev-libs/stb
+- media-libs/vkroots
+- \>=dev-util/reshade-fx-6.4.1
+- (optional) dev-util/reshade-fxc
 
 ### Building
 
-**These instructions use `--prefix=/usr`, which is generally not recommened since vkBasalt will be installed in directories that are meant for the package manager. The alternative is not setting the prefix, it will then be installed in `/usr/local`. But you need to make sure that `ld` finds the library since /usr/local is very likely not in the default path.**
-
-In general, prefer using distro provided packages.
-
-```
-git clone https://github.com/DadSchoorse/vkBasalt.git
-cd vkBasalt
-```
-
-#### 64bit
-
-```
-meson setup --buildtype=release --prefix=/usr builddir
-ninja -C builddir install
-```
-#### 32bit
-
-Make sure that `PKG_CONFIG_PATH=/usr/lib32/pkgconfig` and `--libdir=lib32` are correct for your distro and change them if needed. On Debian based distros you need to replace `lib32` with `lib/i386-linux-gnu`, for example.
-```
-ASFLAGS=--32 CFLAGS=-m32 CXXFLAGS=-m32 PKG_CONFIG_PATH=/usr/lib32/pkgconfig meson setup --prefix=/usr --buildtype=release --libdir=lib32 -Dwith_json=false builddir.32
-ninja -C builddir.32 install
+#### Gentoo
+Prepare overlay
+```sh
+emerge app-eselect/eselect-repository -vp
+eselect repository add vulkanfx git https://github.com/pchome/VulkanFX-gentoo-overlay.git
+emaint sync -r vulkanfx
 ```
 
-## Packaging status
+##### 64bit
+```sh
+emerge media-gfx/VulkanFX -q
+```
 
-[Debian](https://tracker.debian.org/pkg/vkbasalt) `sudo apt install vkbasalt`
+##### 32bit
+nano /etc/portage/package.use/multilib
+```vim
+media-gfx/VulkanFX abi_x86_32
+dev-util/reshade-fx abi_x86_32
+dev-util/reshade-fxc abi_x86_32
+# on/off hotkey
+x11-libs/libX11 abi_x86_32
+# required by x11-libs/libX11-1.8.11::gentoo
+# required by media-gfx/VulkanFX-9999::vulkanfx[xlib]
+# required by media-gfx/VulkanFX (argument)
+>=x11-libs/libxcb-1.17.0 abi_x86_32
+# required by x11-libs/libxcb-1.17.0::gentoo
+# required by x11-libs/libX11-1.8.11::gentoo
+# required by media-gfx/VulkanFX-9999::vulkanfx[xlib]
+# required by media-gfx/VulkanFX (argument)
+>=x11-libs/libXau-1.0.12 abi_x86_32
+# required by x11-libs/libxcb-1.17.0::gentoo
+# required by x11-libs/libX11-1.8.11::gentoo
+# required by media-gfx/VulkanFX-9999::vulkanfx[xlib]
+# required by media-gfx/VulkanFX (argument)
+>=x11-libs/libXdmcp-1.1.5 abi_x86_32
+```
+```sh
+emerge media-gfx/VulkanFX -q
+```
 
-[Fedora](https://src.fedoraproject.org/rpms/vkBasalt) `sudo dnf install vkBasalt`
-
-[Void Linux](https://github.com/void-linux/void-packages/blob/master/srcpkgs/vkBasalt/template) `sudo xbps-install vkBasalt`
+#### non-Gentoo
+You can try to follow [pchome/gentoo-dev-playground](https://github.com/pchome/gentoo-dev-playground) instructions and then return to gentoo route.
 
 ## Usage
 Enable the layer with the environment variable.
 
 ### Standard
-When using the terminal or an application (.desktop) file, execute:
-```ini
-ENABLE_VKBASALT=1 yourgame
-```
+Implicit vulkan layers will be loaded automatically when corresponding environment variable was provided. Use one of:
+* `ENABLE_VULKANFX=1` - default: depth capture disabled
+* `ENABLE_VULKANFX=depth` - depth: depth capture enabled
+* `ENABLE_VULKANFX=simple` - simple: depth capture and ReShadeFX disabled
 
 ### Testing
+#### System
 ##### Get some ReShadeFX shaders
 `$ git clone https://github.com/crosire/reshade-shaders /tmp/fxs`
 ##### Launch an vulkan application
@@ -84,18 +101,23 @@ vkBasalt info:  reshadeIncludePath = /tmp/fxs/Shaders
 300 frames in 5.0 seconds = 59.999 FPS
 ...
 ```
+#### Local
+If built in e.g. gentoo environment and copied to different os / location
+```sh
+#!/bin/sh
 
-### Lutris
-With Lutris, follow these steps below:
-1. Right click on a game, and press `configure`.
-2. Go to the `System options` tab and scroll down to `Environment variables`.
-3. Press on `Add`, and add `ENABLE_VKBASALT` under `Key`, and add `1` under `Value`.
+export VK_IMPLICIT_LAYER_PATH="share/vulkan/implicit_layer.d"
+export LD_LIBRARY_PATH="lib64:lib:${LD_LIBRARY_PATH}"
+export ENABLE_VULKANFX=1
 
-### Steam
-With Steam, edit your launch options and add:
-```ini
-ENABLE_VKBASALT=1 %command%
+export VKBASALT_CONFIG="effects=fxaa:cas"
+
+#export VKBASALT_LOG_LEVEL=debug
+#export VK_LOADER_DEBUG=layer
+
+vkgears
 ```
+where curren directory contain `lib  lib64  run.sh  share`
 
 ## Configure
 
