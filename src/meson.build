@@ -34,7 +34,6 @@ vulkanfx_src = [
     'stb_image.c',
     'stb_image_resize.c',
     'util.cpp',
-    # 'vkdispatch.cpp',
 ]
 
 simple_effects_src = files([
