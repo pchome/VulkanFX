@@ -1,4 +1,4 @@
-project('VulkanFX', ['c', 'cpp'], default_options: ['c_std=c11', 'cpp_std=c++23'])
+project('VulkanFX', ['c', 'cpp'], version: '0.4.0', default_options: ['c_std=c11', 'cpp_std=c++23'])
 
 cpp = meson.get_compiler('cpp')
 add_project_arguments('-fvisibility-inlines-hidden',  language: ['cpp'])
