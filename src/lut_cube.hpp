@@ -1,15 +1,12 @@
+#pragma once
 #ifndef LUT_CUBE_HPP_INCLUDED
 #define LUT_CUBE_HPP_INCLUDED
 
 #include <vector>
-#include <fstream>
 #include <string>
-#include <iostream>
-#include <vector>
-#include <unordered_map>
 #include <cstdlib>
 
-namespace vkBasalt
+namespace VulkanFX
 {
     /*
        reads .cube files
@@ -57,8 +54,8 @@ namespace vkBasalt
         void clampTripel(float x, float y, float z, unsigned char& outX, unsigned char& outY, unsigned char& outZ);
 
         // returns the text without leading whitespace
-        std::string skipWhiteSpace(std::string text);
+        auto skipWhiteSpace(std::string text) -> std::string;
     };
 
-} // namespace vkBasalt
+} // namespace VulkanFX
 #endif // LUT_CUBE_HPP_INCLUDED

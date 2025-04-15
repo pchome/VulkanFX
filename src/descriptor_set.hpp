@@ -3,7 +3,7 @@
 #define DESCRIPTOR_SET_HPP_INCLUDED
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createDescriptorPool(const vkroots::VkDeviceDispatch*         pDispatch,
                               LogicalDevice*                           pLogicalDevice,
@@ -26,6 +26,6 @@ namespace vkBasalt
                                                     VkDescriptorSetLayout                 descriptorSetLayout,
                                                     std::vector<VkSampler>                samplers,
                                                     std::vector<std::vector<VkImageView>> imageViewsVectors) -> std::vector<VkDescriptorSet>;
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // DESCRIPTOR_SET_HPP_INCLUDED

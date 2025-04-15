@@ -5,7 +5,7 @@
 #include "effect_simple.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class DlsEffect : public SimpleEffect
     {
@@ -19,6 +19,6 @@ namespace vkBasalt
                   Config*                          pConfig);
         ~DlsEffect();
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_DLS_HPP_INCLUDED

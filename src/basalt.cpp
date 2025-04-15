@@ -44,11 +44,11 @@
 
 namespace
 {
-    std::shared_ptr<vkBasalt::Config> pConfig = nullptr;
+    std::shared_ptr<VulkanFX::Config> pConfig = nullptr;
     std::mutex                        globalLock;
 } // namespace
 
-namespace vkBasalt
+namespace VulkanFX
 {
     Logger Logger::s_instance;
 
@@ -233,7 +233,7 @@ namespace vkBasalt
                                      .imageCount          = 0,
                                  });
 
-            pConfig = std::make_shared<vkBasalt::Config>();
+            pConfig = std::make_shared<VulkanFX::Config>();
 
             return result;
         }
@@ -373,7 +373,7 @@ namespace vkBasalt
                 else
                 {
 #if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
-                    pLogicalSwapchain->effects.push_back(std::shared_ptr<Effect>(new ReshadeEffect(pDispatch,
+                    pLogicalSwapchain->effects.push_back(std::shared_ptr<Effect>(new ReShadeEffect(pDispatch,
                                                                                                    pLogicalDevice.get(),
                                                                                                    pLogicalSwapchain->format,
                                                                                                    pLogicalSwapchain->imageExtent,
@@ -381,9 +381,9 @@ namespace vkBasalt
                                                                                                    secondImages,
                                                                                                    pConfig.get(),
                                                                                                    effectStrings[i])));
-                    Logger::debug("created ReshadeEffect");
+                    Logger::debug("created ReShadeEffect");
 #else
-                    Logger::debug("ReshadeEffects disabled");
+                    Logger::debug("ReShadeEffects disabled");
 #endif
                 }
             }
@@ -692,9 +692,9 @@ namespace vkBasalt
 #endif
 
     }; // VkDeviceOverrides
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 // Export
-VKROOTS_DEFINE_LAYER_INTERFACES(vkBasalt::VkInstanceOverrides, vkroots::NoOverrides, vkBasalt::VkDeviceOverrides);
-VKROOTS_IMPLEMENT_SYNCHRONIZED_MAP_TYPE_EXT(vkBasalt::deviceMap);
-VKROOTS_IMPLEMENT_SYNCHRONIZED_MAP_TYPE_EXT(vkBasalt::swapchainMap);
+VKROOTS_DEFINE_LAYER_INTERFACES(VulkanFX::VkInstanceOverrides, vkroots::NoOverrides, VulkanFX::VkDeviceOverrides);
+VKROOTS_IMPLEMENT_SYNCHRONIZED_MAP_TYPE_EXT(VulkanFX::deviceMap);
+VKROOTS_IMPLEMENT_SYNCHRONIZED_MAP_TYPE_EXT(VulkanFX::swapchainMap);

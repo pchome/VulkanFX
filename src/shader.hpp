@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void createShaderModule(const vkroots::VkDeviceDispatch* pDispatch,
                             LogicalDevice*                   pLogicalDevice,
@@ -15,6 +15,6 @@ namespace vkBasalt
                             LogicalDevice*                   pLogicalDevice,
                             const std::vector<uint32_t>&     code,
                             VkShaderModule*                  shaderModule);
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // SHADER_HPP_INCLUDED

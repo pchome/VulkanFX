@@ -3,7 +3,7 @@
 #define EFFECT_HPP_INCLUDED
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class Effect
     {
@@ -15,6 +15,6 @@ namespace vkBasalt
 
     private:
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_HPP_INCLUDED

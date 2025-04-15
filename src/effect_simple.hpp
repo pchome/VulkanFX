@@ -5,7 +5,7 @@
 #include "effect.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class SimpleEffect : public Effect
     {
@@ -50,6 +50,6 @@ namespace vkBasalt
                   std::vector<VkImage>             outputImages,
                   Config*                          pConfig);
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_SIMPLE_HPP_INCLUDED

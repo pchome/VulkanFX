@@ -7,7 +7,7 @@
 #include <memory>
 #include <functional>
 
-namespace vkBasalt
+namespace VulkanFX
 {
 
     enum class LogLevel : uint32_t
@@ -55,6 +55,6 @@ namespace vkBasalt
         static auto getFileName() -> std::string;
     };
 
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // LOGGER_HPP_INCLUDED

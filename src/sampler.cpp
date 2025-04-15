@@ -1,6 +1,6 @@
 #include "sampler.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice) -> VkSampler
     {
@@ -32,7 +32,7 @@ namespace vkBasalt
     }
 
 #if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
-    auto createReshadeSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
+    auto createReShadeSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
         -> VkSampler
     {
         VkSampler sampler;
@@ -40,7 +40,7 @@ namespace vkBasalt
         VkFilter            minFilter;
         VkFilter            magFilter;
         VkSamplerMipmapMode mipmapMode;
-        convertReshadeFilter(samplerInfo.filter, minFilter, magFilter, mipmapMode);
+        convertReShadeFilter(samplerInfo.filter, minFilter, magFilter, mipmapMode);
 
         VkSamplerCreateInfo samplerCreateInfo;
         samplerCreateInfo.sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -49,9 +49,9 @@ namespace vkBasalt
         samplerCreateInfo.magFilter               = magFilter;
         samplerCreateInfo.minFilter               = minFilter;
         samplerCreateInfo.mipmapMode              = mipmapMode;
-        samplerCreateInfo.addressModeU            = convertReshadeAddressMode(samplerInfo.address_u);
-        samplerCreateInfo.addressModeV            = convertReshadeAddressMode(samplerInfo.address_v);
-        samplerCreateInfo.addressModeW            = convertReshadeAddressMode(samplerInfo.address_w);
+        samplerCreateInfo.addressModeU            = convertReShadeAddressMode(samplerInfo.address_u);
+        samplerCreateInfo.addressModeV            = convertReShadeAddressMode(samplerInfo.address_v);
+        samplerCreateInfo.addressModeW            = convertReShadeAddressMode(samplerInfo.address_w);
         samplerCreateInfo.mipLodBias              = samplerInfo.lod_bias;
         samplerCreateInfo.anisotropyEnable        = VK_FALSE;
         samplerCreateInfo.maxAnisotropy           = 16;
@@ -67,7 +67,7 @@ namespace vkBasalt
         return sampler;
     }
 
-    auto convertReshadeAddressMode(const reshadefx::texture_address_mode& addressMode) -> VkSamplerAddressMode
+    auto convertReShadeAddressMode(const reshadefx::texture_address_mode& addressMode) -> VkSamplerAddressMode
     {
         switch (addressMode)
         {
@@ -79,7 +79,7 @@ namespace vkBasalt
         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
     }
 
-    void convertReshadeFilter(const reshadefx::filter_mode& textureFilter, VkFilter& minFilter, VkFilter& magFilter, VkSamplerMipmapMode& mipmapMode)
+    void convertReShadeFilter(const reshadefx::filter_mode& textureFilter, VkFilter& minFilter, VkFilter& magFilter, VkSamplerMipmapMode& mipmapMode)
     {
         switch (textureFilter)
         {
@@ -134,4 +134,4 @@ namespace vkBasalt
         }
     }
 #endif
-} // namespace vkBasalt
+} // namespace VulkanFX

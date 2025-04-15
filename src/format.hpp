@@ -4,7 +4,7 @@
 #include <vector>
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     // Returns a matching sRGB format to a UNORM format if it exist, else returns format
     auto convertToSRGB(VkFormat format) -> VkFormat;
@@ -27,6 +27,6 @@ namespace vkBasalt
     auto isDepthFormat(VkFormat format) -> bool;
 
     auto isStencilFormat(VkFormat format) -> bool;
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // FORMAT_HPP_INCLUDED

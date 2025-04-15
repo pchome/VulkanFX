@@ -5,7 +5,7 @@
 #include "effect_simple.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class LutEffect : public SimpleEffect
     {
@@ -28,6 +28,6 @@ namespace vkBasalt
         VkDescriptorPool      lutDescriptorPool;
         VkDescriptorSet       lutDescriptorSet;
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_LUT_HPP_INCLUDED

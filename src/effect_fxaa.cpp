@@ -3,7 +3,7 @@
 #include <cstring>
 #include "shader_sources.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     FxaaEffect::FxaaEffect(const vkroots::VkDeviceDispatch* pDispatch,
                            LogicalDevice*                   pLogicalDevice,
@@ -45,4 +45,4 @@ namespace vkBasalt
     FxaaEffect::~FxaaEffect()
     {
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

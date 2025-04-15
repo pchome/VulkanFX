@@ -3,7 +3,7 @@
 #define MEMORY_HPP_INCLUDED
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto findMemoryTypeIndex(const vkroots::VkDeviceDispatch* pDispatch,
                              LogicalDevice*                   pLogicalDevice,

@@ -4,7 +4,7 @@
 #include <memory>
 #include <mutex>
 
-namespace vkBasalt
+namespace VulkanFX
 {
 // HACK:
 // TODO: maybe find another way to iterate over swapchains
@@ -106,10 +106,10 @@ private:
 };
 
 #define VKROOTS_DEFINE_SYNCHRONIZED_MAP_TYPE_EXT(name, key) \
-  using name = ::vkBasalt::SynchronizedMapObjectExt<key, name##Data>;
+  using name = ::VulkanFX::SynchronizedMapObjectExt<key, name##Data>;
 
 #define VKROOTS_IMPLEMENT_SYNCHRONIZED_MAP_TYPE_EXT(x) \
   template <> std::mutex x::s_mutex = {}; \
   template <> std::unordered_map<x::MapKey, x::MapData> x::s_map = {};
 
-} // namespace vkBasalt
+} // namespace VulkanFX

@@ -3,7 +3,7 @@
 #include "buffer.hpp"
 #include "format.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createImages(const vkroots::VkDeviceDispatch* pDispatch,
                       LogicalDevice*                   pLogicalDevice,
@@ -347,4 +347,4 @@ namespace vkBasalt
                 commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
         }
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

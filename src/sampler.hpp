@@ -7,19 +7,19 @@
 #include "reshade/effect_module.hpp"
 #endif
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice) -> VkSampler;
 
 #if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
-    auto createReshadeSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
+    auto createReShadeSampler(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, const reshadefx::sampler& samplerInfo)
         -> VkSampler;
 
-    auto convertReshadeAddressMode(const reshadefx::texture_address_mode& addressMode) -> VkSamplerAddressMode;
+    auto convertReShadeAddressMode(const reshadefx::texture_address_mode& addressMode) -> VkSamplerAddressMode;
 
-    void convertReshadeFilter(const reshadefx::filter_mode& textureFilter, VkFilter& minFilter, VkFilter& magFilter, VkSamplerMipmapMode& mipmapMode);
+    void convertReShadeFilter(const reshadefx::filter_mode& textureFilter, VkFilter& minFilter, VkFilter& magFilter, VkSamplerMipmapMode& mipmapMode);
 #endif
 
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // SAMPLER_HPP_INCLUDED

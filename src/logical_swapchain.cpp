@@ -1,6 +1,6 @@
 #include "logical_swapchain.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void LogicalSwapchain::destroy(const vkroots::VkDeviceDispatch* pDispatch)
     {
@@ -29,4 +29,4 @@ namespace vkBasalt
             Logger::debug("after DestroySemaphore");
         }
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

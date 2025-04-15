@@ -1,6 +1,6 @@
 #include "shader.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void createShaderModule(const vkroots::VkDeviceDispatch* pDispatch,
                             LogicalDevice*                   pLogicalDevice,
@@ -35,4 +35,4 @@ namespace vkBasalt
         VkResult result = pDispatch->CreateShaderModule(pLogicalDevice->device, &shaderCreateInfo, nullptr, shaderModule);
         ASSERT_VULKAN(result);
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

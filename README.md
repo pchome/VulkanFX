@@ -8,10 +8,18 @@ Currently, the build in effects are:
 - Enhanced Subpixel Morphological Anti-Aliasing
 - 3D color LookUp Table
 
-It is also possible to use Reshade Fx shaders.
+It is also possible to use ReShade FX shaders.
+
+## Fork difference
+So far:
+- unbundled `stb` headers, use system package
+- unbundeled `ReShade FX`, bumped to most recent version, use system package
+- migrated to `vkroots`, use system package
+- split in 3 parts, removed `depthCapture` option from config, config initialized only once
+
 
 ## Disclaimer
-This is one of my first projects ever, so expect it to have bugs. Use it at your own risk.
+Expect it to have bugs. Use it at your own risk.
 
 ## Building from Source
 
@@ -79,23 +87,23 @@ Enable the layer with the environment variable.
 Implicit vulkan layers will be loaded automatically when corresponding environment variable was provided. Use one of:
 * `ENABLE_VULKANFX=1` - default: depth capture disabled
 * `ENABLE_VULKANFX=depth` - depth: depth capture enabled
-* `ENABLE_VULKANFX=simple` - simple: depth capture and ReShadeFX disabled
+* `ENABLE_VULKANFX=simple` - simple: depth capture and ReShade FX disabled
 
 ### Testing
 #### System
-##### Get some ReShadeFX shaders
+##### Get some ReShade FX shaders
 `$ git clone https://github.com/crosire/reshade-shaders /tmp/fxs`
 ##### Launch an vulkan application
-`$ ENABLE_VKBASALT=1 VKBASALT_CONFIG='effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders' vkgears`
+`$ ENABLE_VULKANFX=1 VULKANFX_CONFIG='effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders' vkgears`
 ##### Expected output
 ```js
-vkBasalt err:   no good config file
-vkBasalt info:  config string: effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders
-vkBasalt info:  effects = fxaa:cas:dlt
-vkBasalt info:  casSharpness = 1.0
-vkBasalt info:  dlt = /tmp/fxs/Shaders/Daltonize.fx
-vkBasalt info:  reshadeTexturePath = /tmp/fxs/Textures
-vkBasalt info:  reshadeIncludePath = /tmp/fxs/Shaders
+VulkanFX info:  no good config file
+VulkanFX info:  config string: effects=fxaa:cas:dlt;casSharpness=1.0;dlt=/tmp/fxs/Shaders/Daltonize.fx;reshadeTexturePath=/tmp/fxs/Textures;reshadeIncludePath=/tmp/fxs/Shaders
+VulkanFX info:  effects = fxaa:cas:dlt
+VulkanFX info:  casSharpness = 1.0
+VulkanFX info:  dlt = /tmp/fxs/Shaders/Daltonize.fx
+VulkanFX info:  reshadeTexturePath = /tmp/fxs/Textures
+VulkanFX info:  reshadeIncludePath = /tmp/fxs/Shaders
 304 frames in 5.0 seconds = 60.779 FPS
 301 frames in 5.0 seconds = 60.002 FPS
 300 frames in 5.0 seconds = 59.999 FPS
@@ -110,9 +118,9 @@ export VK_IMPLICIT_LAYER_PATH="share/vulkan/implicit_layer.d"
 export LD_LIBRARY_PATH="lib64:lib:${LD_LIBRARY_PATH}"
 export ENABLE_VULKANFX=1
 
-export VKBASALT_CONFIG="effects=fxaa:cas"
+export VULKANFX_CONFIG="effects=fxaa:cas"
 
-#export VKBASALT_LOG_LEVEL=debug
+#export VULKANFX_LOG_LEVEL=debug
 #export VK_LOADER_DEBUG=layer
 
 vkgears
@@ -123,21 +131,21 @@ where curren directory contain `lib  lib64  run.sh  share`
 
 Settings like the CAS sharpening strength can be changed in the config file.
 The config file will be searched for in the following locations:
-* a file set with the environment variable`VKBASALT_CONFIG_FILE=/path/to/vkBasalt.conf`
-* `vkBasalt.conf` in the working directory of the game
-* `$XDG_CONFIG_HOME/vkBasalt/vkBasalt.conf` or `~/.config/vkBasalt/vkBasalt.conf` if `XDG_CONFIG_HOME` is not set
-* `$XDG_DATA_HOME/vkBasalt/vkBasalt.conf` or `~/.local/share/vkBasalt/vkBasalt.conf` if `XDG_DATA_HOME` is not set
-* `/etc/vkBasalt.conf`
-* `/etc/vkBasalt/vkBasalt.conf`
-* `/usr/share/vkBasalt/vkBasalt.conf`
+* a file set with the environment variable`VULKANFX_CONFIG_FILE=/path/to/VulkanFX.conf`
+* `VulkanFX.conf` in the working directory of the game
+* `$XDG_CONFIG_HOME/VulkanFX/VulkanFX.conf` or `~/.config/VulkanFX/VulkanFX.conf` if `XDG_CONFIG_HOME` is not set
+* `$XDG_DATA_HOME/VulkanFX/VulkanFX.conf` or `~/.local/share/VulkanFX/VulkanFX.conf` if `XDG_DATA_HOME` is not set
+* `/etc/VulkanFX.conf`
+* `/etc/VulkanFX/VulkanFX.conf`
+* `/usr/share/VulkanFX/VulkanFX.conf`
 
-If you want to make changes for one game only, you can create a file named `vkBasalt.conf` in the working directory of the game and change the values there.
+If you want to make changes for one game only, you can create a file named `VulkanFX.conf` in the working directory of the game and change the values there.
 
 #### Quick override
-To override some of the default config options the `VKBASALT_CONFIG` env var can be used, e.g. `VKBASALT_CONFIG='effects=fxaa:cas;casSharpness=1.0'`.
+To override some of the default config options the `VULKANFX_CONFIG` env var can be used, e.g. `VULKANFX_CONFIG='effects=fxaa:cas;casSharpness=1.0'`.
 The separator is `;`
 
-#### Reshade Fx shaders
+#### ReShade FX shaders
 
 To run reshade fx shaders e.g. shaders from the [reshade repo](https://github.com/crosire/reshade-shaders), you have to set `reshadeTexturePath` and `reshadeIncludePath` to the matching dirctories from the repo. To then use a specific shader you need to set a custom effect name to the shader path and then add that effect name to `effects` like every other effect.
 
@@ -157,9 +165,9 @@ The [HOME key](https://en.wikipedia.org/wiki/Home_key) can be used to disable an
 
 #### Debug Output
 
-The amount of debug output can be set with the `VKBASALT_LOG_LEVEL` env var, e.g. `VKBASALT_LOG_LEVEL=debug`. Possible values are: `trace, debug, info, warn, error, none`.
+The amount of debug output can be set with the `VULKANFX_LOG_LEVEL` env var, e.g. `VULKANFX_LOG_LEVEL=debug`. Possible values are: `trace, debug, info, warn, error, none`.
 
-By default the logger outputs to stderr, a file as output location can be set with the `VKBASALT_LOG_FILE` env var, e.g. `VKBASALT_LOG_FILE="vkBasalt.log"`.
+By default the logger outputs to stderr, a file as output location can be set with the `VULKANFX_LOG_FILE` env var, e.g. `VULKANFX_LOG_FILE="VulkanFX.log"`.
 
 
 ## FAQ

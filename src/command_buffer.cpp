@@ -3,7 +3,7 @@
 #include "format.hpp"
 #include "util.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto allocateCommandBuffer(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count)
         -> std::vector<VkCommandBuffer>
@@ -29,7 +29,7 @@ namespace vkBasalt
     }
     void writeCommandBuffers(const vkroots::VkDeviceDispatch*               pDispatch,
                              LogicalDevice*                                 pLogicalDevice,
-                             std::vector<std::shared_ptr<vkBasalt::Effect>> effects,
+                             std::vector<std::shared_ptr<VulkanFX::Effect>> effects,
                              VkImage                                        depthImage,
                              VkImageView                                    depthImageView,
                              VkFormat                                       depthFormat,
@@ -127,4 +127,4 @@ namespace vkBasalt
         return semaphores;
     }
 
-} // namespace vkBasalt
+} // namespace VulkanFX

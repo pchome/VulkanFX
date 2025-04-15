@@ -5,7 +5,7 @@
 #include "effect_simple.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class DebandEffect : public SimpleEffect
     {
@@ -19,6 +19,6 @@ namespace vkBasalt
                      Config*                          pConfig);
         ~DebandEffect();
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_DEBAND_HPP_INCLUDED

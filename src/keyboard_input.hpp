@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <string>
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    uint32_t convertToKeySym(std::string key);
-    bool     isKeyPressed(uint32_t ks);
-} // namespace vkBasalt
+    auto convertToKeySym(std::string key) -> uint32_t;
+    auto isKeyPressed(uint32_t ks) -> bool;
+} // namespace VulkanFX

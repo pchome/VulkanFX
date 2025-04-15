@@ -1,8 +1,10 @@
 #include "lut_cube.hpp"
 
+#include <fstream>
+
 #include "logger.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     LutCube::LutCube()
     {
@@ -79,7 +81,7 @@ namespace vkBasalt
         }
     }
 
-    std::string LutCube::skipWhiteSpace(std::string text)
+    auto LutCube::skipWhiteSpace(std::string text) -> std::string
     {
         while (text.size() > 0 && (text[0] == ' ' || text[0] == '\t'))
         {
@@ -121,4 +123,4 @@ namespace vkBasalt
         colorCube[locationR + 1] = g;
         colorCube[locationR + 2] = b;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

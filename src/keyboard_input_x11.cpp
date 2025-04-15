@@ -11,12 +11,12 @@
 #include <unistd.h>
 #include <cstring>
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    uint32_t convertToKeySymX11(std::string key)
+    auto convertToKeySymX11(std::string key) -> uint32_t
     {
         // TODO what if X11 isn't loaded?
-        uint32_t result = (uint32_t) XStringToKeysym(key.c_str());
+        auto result = (uint32_t) XStringToKeysym(key.c_str());
         if (!result)
         {
             Logger::err("invalid key");
@@ -24,7 +24,7 @@ namespace vkBasalt
         return result;
     }
 
-    bool isKeyPressedX11(uint32_t ks)
+    auto isKeyPressedX11(uint32_t ks) -> bool
     {
         static int usesX11 = -1;
 
@@ -32,7 +32,7 @@ namespace vkBasalt
 
         if (usesX11 < 0)
         {
-            const char* disVar = getenv("DISPLAY");
+            const char* disVar = std::getenv("DISPLAY");
             if (!disVar || !std::strcmp(disVar, ""))
             {
                 usesX11 = 0;
@@ -60,4 +60,4 @@ namespace vkBasalt
         return !!(keys_return[kc2 >> 3] & (1 << (kc2 & 7)));
     }
 
-} // namespace vkBasalt
+} // namespace VulkanFX

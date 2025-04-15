@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void addUniqueCString(std::vector<const char*>& stringVector, const char* addString)
     {
@@ -63,4 +63,4 @@ namespace vkBasalt
             std::cout << "\033[" << magicString << "m" << output << "\033[0m" << std::endl;
         }
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

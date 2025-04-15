@@ -7,10 +7,11 @@
       "library_path": "libVkLayer_VulkanFX_default.so",
       "api_version": "1.3.295",
       "implementation_version": "3",
-      "status": "ALPHA",
+      "status": "BETA",
       "platforms": ["LINUX"],
       "description": "a post processing layer",
       "introduction": "Former vkBasalt post processing layer with spices.",
+      "url": "https://github.com/pchome/VulkanFX",
       "enable_environment": {
         "ENABLE_VULKANFX": "1"
       },
@@ -24,10 +25,11 @@
       "library_path": "libVkLayer_VulkanFX_depth.so",
       "api_version": "1.3.295",
       "implementation_version": "3",
-      "status": "ALPHA",
+      "status": "BETA",
       "platforms": ["LINUX"],
       "description": "a post processing layer (with depth capture enabled)",
       "introduction": "Former vkBasalt post processing layer with spices.",
+      "url": "https://github.com/pchome/VulkanFX",
       "enable_environment": {
         "ENABLE_VULKANFX": "depth"
       },
@@ -41,10 +43,11 @@
       "library_path": "libVkLayer_VulkanFX_simple.so",
       "api_version": "1.3.295",
       "implementation_version": "3",
-      "status": "ALPHA",
+      "status": "BETA",
       "platforms": ["LINUX"],
-      "description": "a post processing layer (with ReShadeFX disabled)",
+      "description": "a post processing layer (with ReShade FX disabled)",
       "introduction": "Former vkBasalt post processing layer with spices.",
+      "url": "https://github.com/pchome/VulkanFX",
       "enable_environment": {
         "ENABLE_VULKANFX": "simple"
       },

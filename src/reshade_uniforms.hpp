@@ -1,9 +1,6 @@
+#pragma once
 #ifndef RESHADE_UNIFORMS_HPP_INCLUDED
 #define RESHADE_UNIFORMS_HPP_INCLUDED
-#include <vector>
-#include <fstream>
-#include <string>
-#include <iostream>
 #include <vector>
 #include <chrono>
 #include <memory>
@@ -12,24 +9,24 @@
 
 #include "reshade/effect_module.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    void enumerateReshadeUniforms(reshadefx::effect_module module);
+    void enumerateReShadeUniforms(reshadefx::effect_module module);
 
-    class ReshadeUniform
+    class ReShadeUniform
     {
     public:
         void virtual update(void* mapedBuffer) = 0;
-        virtual ~ReshadeUniform(){};
+        virtual ~ReShadeUniform(){};
 
     protected:
         uint32_t offset;
         uint32_t size;
     };
 
-    std::vector<std::shared_ptr<ReshadeUniform>> createReshadeUniforms(reshadefx::effect_module module);
+    auto createReShadeUniforms(reshadefx::effect_module module) -> std::vector<std::shared_ptr<ReShadeUniform>>;
 
-    class FrameTimeUniform : public ReshadeUniform
+    class FrameTimeUniform : public ReShadeUniform
     {
     public:
         FrameTimeUniform(reshadefx::uniform uniformInfo);
@@ -40,7 +37,7 @@ namespace vkBasalt
         std::chrono::time_point<std::chrono::high_resolution_clock> lastFrame;
     };
 
-    class FrameCountUniform : public ReshadeUniform
+    class FrameCountUniform : public ReShadeUniform
     {
     public:
         FrameCountUniform(reshadefx::uniform uniformInfo);
@@ -51,7 +48,7 @@ namespace vkBasalt
         int32_t count = 0;
     };
 
-    class DateUniform : public ReshadeUniform
+    class DateUniform : public ReShadeUniform
     {
     public:
         DateUniform(reshadefx::uniform uniformInfo);
@@ -59,7 +56,7 @@ namespace vkBasalt
         virtual ~DateUniform();
     };
 
-    class TimerUniform : public ReshadeUniform
+    class TimerUniform : public ReShadeUniform
     {
     public:
         TimerUniform(reshadefx::uniform uniformInfo);
@@ -70,7 +67,7 @@ namespace vkBasalt
         std::chrono::time_point<std::chrono::high_resolution_clock> start;
     };
 
-    class PingPongUniform : public ReshadeUniform
+    class PingPongUniform : public ReShadeUniform
     {
     public:
         PingPongUniform(reshadefx::uniform uniformInfo);
@@ -88,7 +85,7 @@ namespace vkBasalt
         float currentValue[2] = {0.0f, 1.0f};
     };
 
-    class RandomUniform : public ReshadeUniform
+    class RandomUniform : public ReShadeUniform
     {
     public:
         RandomUniform(reshadefx::uniform uniformInfo);
@@ -100,7 +97,7 @@ namespace vkBasalt
         int min = 0;
     };
 
-    class KeyUniform : public ReshadeUniform
+    class KeyUniform : public ReShadeUniform
     {
     public:
         KeyUniform(reshadefx::uniform uniformInfo);
@@ -108,7 +105,7 @@ namespace vkBasalt
         virtual ~KeyUniform();
     };
 
-    class MouseButtonUniform : public ReshadeUniform
+    class MouseButtonUniform : public ReShadeUniform
     {
     public:
         MouseButtonUniform(reshadefx::uniform uniformInfo);
@@ -116,7 +113,7 @@ namespace vkBasalt
         virtual ~MouseButtonUniform();
     };
 
-    class MousePointUniform : public ReshadeUniform
+    class MousePointUniform : public ReShadeUniform
     {
     public:
         MousePointUniform(reshadefx::uniform uniformInfo);
@@ -124,7 +121,7 @@ namespace vkBasalt
         virtual ~MousePointUniform();
     };
 
-    class MouseDeltaUniform : public ReshadeUniform
+    class MouseDeltaUniform : public ReShadeUniform
     {
     public:
         MouseDeltaUniform(reshadefx::uniform uniformInfo);
@@ -132,13 +129,13 @@ namespace vkBasalt
         virtual ~MouseDeltaUniform();
     };
 
-    class DepthUniform : public ReshadeUniform
+    class DepthUniform : public ReShadeUniform
     {
     public:
         DepthUniform(reshadefx::uniform uniformInfo);
         void virtual update(void* mapedBuffer) override;
         virtual ~DepthUniform();
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // RESHADE_UNIFORMS_HPP_INCLUDED

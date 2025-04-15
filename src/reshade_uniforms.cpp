@@ -9,9 +9,9 @@
 
 #include "logger.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    void enumerateReshadeUniforms(reshadefx::effect_module module)
+    void enumerateReShadeUniforms(reshadefx::effect_module module)
     {
         for (auto& uniform : module.uniforms)
         {
@@ -24,9 +24,9 @@ namespace vkBasalt
         }
     }
 
-    std::vector<std::shared_ptr<ReshadeUniform>> createReshadeUniforms(reshadefx::effect_module module)
+    auto createReShadeUniforms(reshadefx::effect_module module) -> std::vector<std::shared_ptr<ReShadeUniform>>
     {
-        std::vector<std::shared_ptr<ReshadeUniform>> uniforms;
+        std::vector<std::shared_ptr<ReShadeUniform>> uniforms;
         for (auto& uniform : module.uniforms)
         {
             auto source = std::find_if(uniform.annotations.begin(), uniform.annotations.end(), [](const auto& a) {
@@ -34,47 +34,47 @@ namespace vkBasalt
                           })->value.string_data;
             if (source == "frametime")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new FrameTimeUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new FrameTimeUniform(uniform)));
             }
             else if (source == "framecount")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new FrameCountUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new FrameCountUniform(uniform)));
             }
             else if (source == "date")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new DateUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new DateUniform(uniform)));
             }
             else if (source == "timer")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new TimerUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new TimerUniform(uniform)));
             }
             else if (source == "pingpong")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new PingPongUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new PingPongUniform(uniform)));
             }
             else if (source == "random")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new RandomUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new RandomUniform(uniform)));
             }
             else if (source == "key")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new KeyUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new KeyUniform(uniform)));
             }
             else if (source == "mousebutton")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new MouseButtonUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new MouseButtonUniform(uniform)));
             }
             else if (source == "mousepoint")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new MousePointUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new MousePointUniform(uniform)));
             }
             else if (source == "mousedelta")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new MouseDeltaUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new MouseDeltaUniform(uniform)));
             }
             else if (source == "bufready_depth")
             {
-                uniforms.push_back(std::shared_ptr<ReshadeUniform>(new DepthUniform(uniform)));
+                uniforms.push_back(std::shared_ptr<ReShadeUniform>(new DepthUniform(uniform)));
             }
         }
         return uniforms;
@@ -380,4 +380,4 @@ namespace vkBasalt
     DepthUniform::~DepthUniform()
     {
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

@@ -5,7 +5,7 @@
 #include "effect_simple.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class FxaaEffect : public SimpleEffect
     {
@@ -19,6 +19,6 @@ namespace vkBasalt
                    Config*                          pConfig);
         ~FxaaEffect();
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_FXAA_HPP_INCLUDED

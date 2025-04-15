@@ -1,7 +1,7 @@
 #include "image_view.hpp"
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createImageViews(const vkroots::VkDeviceDispatch* pDispatch,
                           LogicalDevice*                   pLogicalDevice,
@@ -42,4 +42,4 @@ namespace vkBasalt
         return imageViews;
     }
 
-} // namespace vkBasalt
+} // namespace VulkanFX

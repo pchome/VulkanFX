@@ -6,7 +6,7 @@
 #include "effect.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class SmaaEffect : public Effect
     {
@@ -63,6 +63,6 @@ namespace vkBasalt
 
         Config* pConfig;
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_SMAA_HPP_INCLUDED

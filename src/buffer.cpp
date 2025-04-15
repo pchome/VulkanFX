@@ -1,7 +1,7 @@
 #include "buffer.hpp"
 #include "memory.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void createBuffer(const vkroots::VkDeviceDispatch* pDispatch,
                       LogicalDevice*                   pLogicalDevice,
@@ -37,4 +37,4 @@ namespace vkBasalt
         ASSERT_VULKAN(result);
     }
 
-} // namespace vkBasalt
+} // namespace VulkanFX

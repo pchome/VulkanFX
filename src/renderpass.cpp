@@ -1,8 +1,8 @@
 #include "renderpass.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    VkRenderPass createRenderPass(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, VkFormat format)
+    auto createRenderPass(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, VkFormat format) -> VkRenderPass
     {
         VkRenderPass renderPass;
 
@@ -58,4 +58,4 @@ namespace vkBasalt
 
         return renderPass;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

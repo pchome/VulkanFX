@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace vkBasalt
+namespace VulkanFX
 {
 
     Logger::Logger() : m_minLevel(getMinLogLevel())
@@ -69,7 +69,7 @@ namespace vkBasalt
             std::lock_guard<std::mutex> lock(m_mutex);
 
             static std::array<const char*, 5> s_prefixes = {
-                {"vkBasalt trace: ", "vkBasalt debug: ", "vkBasalt info:  ", "vkBasalt warn:  ", "vkBasalt err:   "}};
+                {"VulkanFX trace: ", "VulkanFX debug: ", "VulkanFX info:  ", "VulkanFX warn:  ", "VulkanFX err:   "}};
 
             const char* prefix = s_prefixes.at(static_cast<uint32_t>(level));
 
@@ -94,7 +94,7 @@ namespace vkBasalt
             {"none", LogLevel::None},
         }};
 
-        const char* envVar = std::getenv("VKBASALT_LOG_LEVEL");
+        const char* envVar = std::getenv("VULKANFX_LOG_LEVEL");
 
         const std::string logLevelStr = envVar ? envVar : "";
 
@@ -109,7 +109,7 @@ namespace vkBasalt
 
     auto Logger::getFileName() -> std::string
     {
-        const char* envVar = std::getenv("VKBASALT_LOG_FILE");
+        const char* envVar = std::getenv("VULKANFX_LOG_FILE");
 
         std::string filename = envVar ? envVar : "";
 
@@ -121,4 +121,4 @@ namespace vkBasalt
         return filename;
     }
 
-} // namespace vkBasalt
+} // namespace VulkanFX

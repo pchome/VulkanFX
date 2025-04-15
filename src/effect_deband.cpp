@@ -4,7 +4,7 @@
 
 #include "shader_sources.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     DebandEffect::DebandEffect(const vkroots::VkDeviceDispatch* pDispatch,LogicalDevice*       pLogicalDevice,
                                VkFormat             format,
@@ -63,4 +63,4 @@ namespace vkBasalt
     DebandEffect::~DebandEffect()
     {
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

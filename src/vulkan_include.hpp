@@ -17,7 +17,7 @@
     }
 #endif
 
-namespace vkBasalt
+namespace VulkanFX
 {
     struct LogicalDevice
     {
@@ -38,6 +38,6 @@ namespace vkBasalt
     {
         *reinterpret_cast<void**>(dispatchableObject) = *reinterpret_cast<void**>(source);
     }
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // VULKAN_INCLUDE_HPP_INCLUDED

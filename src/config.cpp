@@ -4,36 +4,36 @@
 #include <sstream>
 #include <locale>
 
-namespace vkBasalt
+namespace VulkanFX
 {
     Config::Config()
     {
         // Custom config file path
-        const char* tmpConfEnv       = std::getenv("VKBASALT_CONFIG_FILE");
+        const char* tmpConfEnv       = std::getenv("VULKANFX_CONFIG_FILE");
         std::string customConfigFile = tmpConfEnv ? std::string(tmpConfEnv) : "";
 
         // Custom config string
-        const char* tmpConfStringEnv   = std::getenv("VKBASALT_CONFIG");
+        const char* tmpConfStringEnv   = std::getenv("VULKANFX_CONFIG");
         std::string customConfigString = tmpConfStringEnv ? std::string(tmpConfStringEnv) : "";
 
         // User config file path
         const char* tmpHomeEnv     = std::getenv("XDG_DATA_HOME");
-        std::string userConfigFile = tmpHomeEnv ? std::string(tmpHomeEnv) + "/vkBasalt/vkBasalt.conf"
-                                                : std::string(std::getenv("HOME")) + "/.local/share/vkBasalt/vkBasalt.conf";
+        std::string userConfigFile = tmpHomeEnv ? std::string(tmpHomeEnv) + "/VulkanFX/VulkanFX.conf"
+                                                : std::string(std::getenv("HOME")) + "/.local/share/VulkanFX/VulkanFX.conf";
 
         const char* tmpConfigEnv      = std::getenv("XDG_CONFIG_HOME");
-        std::string userXdgConfigFile = tmpConfigEnv ? std::string(tmpConfigEnv) + "/vkBasalt/vkBasalt.conf"
-                                                     : std::string(std::getenv("HOME")) + "/.config/vkBasalt/vkBasalt.conf";
+        std::string userXdgConfigFile = tmpConfigEnv ? std::string(tmpConfigEnv) + "/VulkanFX/VulkanFX.conf"
+                                                     : std::string(std::getenv("HOME")) + "/.config/VulkanFX/VulkanFX.conf";
 
         // Allowed config paths
         const std::array<std::string, 7> configPath = {
-            customConfigFile,                                    // custom config (VKBASALT_CONFIG_FILE=/path/to/vkBasalt.conf)
-            "vkBasalt.conf",                                     // per game config
+            customConfigFile,                                    // custom config (VULKANFX_CONFIG_FILE=/path/to/VulkanFX.conf)
+            "VulkanFX.conf",                                     // per game config
             userXdgConfigFile,                                   // user-global config
             userConfigFile,                                      // legacy default config
-            std::string(SYSCONFDIR) + "/vkBasalt.conf",          // system-wide config
-            std::string(SYSCONFDIR) + "/vkBasalt/vkBasalt.conf", // system-wide config (alternative)
-            std::string(DATADIR) + "/vkBasalt/vkBasalt.conf",    // legacy system-wide config
+            std::string(SYSCONFDIR) + "/VulkanFX.conf",          // system-wide config
+            std::string(SYSCONFDIR) + "/VulkanFX/VulkanFX.conf", // system-wide config (alternative)
+            std::string(DATADIR) + "/VulkanFX/VulkanFX.conf",    // legacy system-wide config
         };
 
         auto hasConfigFile = false;
@@ -51,7 +51,7 @@ namespace vkBasalt
 
         if (!hasConfigFile)
         {
-            Logger::err("no good config file");
+            Logger::info("no good config file");
         }
 
         if (!customConfigString.empty())
@@ -217,4 +217,4 @@ namespace vkBasalt
             }
         }
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

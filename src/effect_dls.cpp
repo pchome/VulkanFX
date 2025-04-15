@@ -4,7 +4,7 @@
 
 #include "shader_sources.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     DlsEffect::DlsEffect(const vkroots::VkDeviceDispatch* pDispatch,
                          LogicalDevice*                   pLogicalDevice,
@@ -44,4 +44,4 @@ namespace vkBasalt
     DlsEffect::~DlsEffect()
     {
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

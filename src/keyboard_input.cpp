@@ -1,31 +1,29 @@
 #include "keyboard_input.hpp"
 
-#include "logger.hpp"
-
 // TODO build without X11
-#ifndef VKBASALT_X11
-#define VKBASALT_X11 1
+#ifndef VULKANFX_X11
+#define VULKANFX_X11 1
 #endif
 
-#if VKBASALT_X11
+#if VULKANFX_X11
 #include "keyboard_input_x11.hpp"
 #endif
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    uint32_t convertToKeySym(std::string key)
+    auto convertToKeySym(std::string key) -> uint32_t
     {
-#if VKBASALT_X11
+#if VULKANFX_X11
         return convertToKeySymX11(key);
 #endif
         return 0u;
     }
 
-    bool isKeyPressed(uint32_t ks)
+    auto isKeyPressed(uint32_t ks) -> bool
     {
-#if VKBASALT_X11
+#if VULKANFX_X11
         return isKeyPressedX11(ks);
 #endif
         return false;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

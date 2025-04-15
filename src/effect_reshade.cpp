@@ -26,9 +26,9 @@
 #include "stb_image_dds.h"
 #include <stb/stb_image_resize2.h>
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    ReshadeEffect::ReshadeEffect(const vkroots::VkDeviceDispatch* pDispatch,
+    ReShadeEffect::ReShadeEffect(const vkroots::VkDeviceDispatch* pDispatch,
                                  LogicalDevice*                   pLogicalDevice,
                                  VkFormat                         format,
                                  VkExtent2D                       imageExtent,
@@ -37,7 +37,7 @@ namespace vkBasalt
                                  Config*                          pConfig,
                                  std::string                      effectName)
     {
-        Logger::debug("in creating ReshadeEffect");
+        Logger::debug("in creating ReShadeEffect");
 
         this->pDispatch        = pDispatch;
         this->pLogicalDevice   = pLogicalDevice;
@@ -56,11 +56,11 @@ namespace vkBasalt
         outputImageViewsUNORM = createImageViews(pDispatch, pLogicalDevice, inputOutputFormatUNORM, outputImages);
         Logger::debug("created ImageViews");
 
-        createReshadeModule();
+        createReShadeModule();
 
-        enumerateReshadeUniforms(module);
+        enumerateReShadeUniforms(module);
 
-        uniforms = createReshadeUniforms(module);
+        uniforms = createReShadeUniforms(module);
 
         bufferSize = module.total_uniform_size;
         if (bufferSize)
@@ -135,7 +135,7 @@ namespace vkBasalt
                                                            pLogicalDevice,
                                                            1,
                                                            textureExtent,
-                                                           convertReshadeFormat(module.textures[i].format),
+                                                           convertReShadeFormat(module.textures[i].format),
                                                            VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
                                                                | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
                                                            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -147,7 +147,7 @@ namespace vkBasalt
                     std::vector<VkImageView>(inputImages.size(),
                                              createImageViews(pDispatch,
                                                               pLogicalDevice,
-                                                              convertToUNORM(convertReshadeFormat(module.textures[i].format)),
+                                                              convertToUNORM(convertReShadeFormat(module.textures[i].format)),
                                                               images,
                                                               VK_IMAGE_VIEW_TYPE_2D,
                                                               VK_IMAGE_ASPECT_COLOR_BIT,
@@ -157,7 +157,7 @@ namespace vkBasalt
                     std::vector<VkImageView>(inputImages.size(),
                                              createImageViews(pDispatch,
                                                               pLogicalDevice,
-                                                              convertToSRGB(convertReshadeFormat(module.textures[i].format)),
+                                                              convertToSRGB(convertReShadeFormat(module.textures[i].format)),
                                                               images,
                                                               VK_IMAGE_VIEW_TYPE_2D,
                                                               VK_IMAGE_ASPECT_COLOR_BIT,
@@ -171,11 +171,11 @@ namespace vkBasalt
 
                     renderImageViewsUNORM[module.textures[i].unique_name] = std::vector<VkImageView>(
                         inputImages.size(),
-                        createImageViews(pDispatch, pLogicalDevice, convertToUNORM(convertReshadeFormat(module.textures[i].format)), images)[0]);
+                        createImageViews(pDispatch, pLogicalDevice, convertToUNORM(convertReShadeFormat(module.textures[i].format)), images)[0]);
 
                     renderImageViewsSRGB[module.textures[i].unique_name] = std::vector<VkImageView>(
                         inputImages.size(),
-                        createImageViews(pDispatch, pLogicalDevice, convertToSRGB(convertReshadeFormat(module.textures[i].format)), images)[0]);
+                        createImageViews(pDispatch, pLogicalDevice, convertToSRGB(convertReShadeFormat(module.textures[i].format)), images)[0]);
                 }
                 else
                 {
@@ -183,8 +183,8 @@ namespace vkBasalt
                     renderImageViewsSRGB[module.textures[i].unique_name]  = imageViewsSRGB;
                 }
 
-                textureFormatsUNORM[module.textures[i].unique_name] = convertToUNORM(convertReshadeFormat(module.textures[i].format));
-                textureFormatsSRGB[module.textures[i].unique_name]  = convertToSRGB(convertReshadeFormat(module.textures[i].format));
+                textureFormatsUNORM[module.textures[i].unique_name] = convertToUNORM(convertReShadeFormat(module.textures[i].format));
+                textureFormatsSRGB[module.textures[i].unique_name]  = convertToSRGB(convertReShadeFormat(module.textures[i].format));
                 changeImageLayout(pDispatch, pLogicalDevice, images, module.textures[i].levels);
                 continue;
             }
@@ -196,7 +196,7 @@ namespace vkBasalt
                                  pLogicalDevice,
                                  1,
                                  textureExtent,
-                                 convertReshadeFormat(module.textures[i].format), // TODO search for format and save it
+                                 convertReShadeFormat(module.textures[i].format), // TODO search for format and save it
                                  VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
                                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                  textureMemory.back(),
@@ -206,7 +206,7 @@ namespace vkBasalt
 
                 std::vector<VkImageView> imageViews = createImageViews(pDispatch,
                                                                        pLogicalDevice,
-                                                                       convertToUNORM(convertReshadeFormat(module.textures[i].format)),
+                                                                       convertToUNORM(convertReShadeFormat(module.textures[i].format)),
                                                                        images,
                                                                        VK_IMAGE_VIEW_TYPE_2D,
                                                                        VK_IMAGE_ASPECT_COLOR_BIT,
@@ -216,7 +216,7 @@ namespace vkBasalt
 
                 imageViews = createImageViews(pDispatch,
                                               pLogicalDevice,
-                                              convertToSRGB(convertReshadeFormat(module.textures[i].format)),
+                                              convertToSRGB(convertReShadeFormat(module.textures[i].format)),
                                               images,
                                               VK_IMAGE_VIEW_TYPE_2D,
                                               VK_IMAGE_ASPECT_COLOR_BIT,
@@ -230,8 +230,8 @@ namespace vkBasalt
                 renderImageViewsUNORM[module.textures[i].unique_name] = imageViewsUNORM;
                 renderImageViewsSRGB[module.textures[i].unique_name]  = imageViewsSRGB;
 
-                textureFormatsUNORM[module.textures[i].unique_name] = convertToUNORM(convertReshadeFormat(module.textures[i].format));
-                textureFormatsSRGB[module.textures[i].unique_name]  = convertToSRGB(convertReshadeFormat(module.textures[i].format));
+                textureFormatsUNORM[module.textures[i].unique_name] = convertToUNORM(convertReShadeFormat(module.textures[i].format));
+                textureFormatsSRGB[module.textures[i].unique_name]  = convertToSRGB(convertReShadeFormat(module.textures[i].format));
 
                 int desiredChannels;
                 switch (textureFormatsUNORM[module.textures[i].unique_name])
@@ -316,7 +316,7 @@ namespace vkBasalt
         {
             reshadefx::sampler info = module.samplers[i];
 
-            VkSampler sampler = createReshadeSampler(pDispatch, pLogicalDevice, info);
+            VkSampler sampler = createReShadeSampler(pDispatch, pLogicalDevice, info);
 
             samplers.push_back(sampler);
 
@@ -448,12 +448,12 @@ namespace vkBasalt
 
                 VkPipelineColorBlendAttachmentState colorBlendAttachment;
                 colorBlendAttachment.blendEnable         = pass.blend_enable[i];
-                colorBlendAttachment.srcColorBlendFactor = convertReshadeBlendFactor(pass.source_color_blend_factor[i]);
-                colorBlendAttachment.dstColorBlendFactor = convertReshadeBlendFactor(pass.dest_color_blend_factor[i]);
-                colorBlendAttachment.colorBlendOp        = convertReshadeBlendOp(pass.color_blend_op[i]);
-                colorBlendAttachment.srcAlphaBlendFactor = convertReshadeBlendFactor(pass.source_alpha_blend_factor[i]);
-                colorBlendAttachment.dstAlphaBlendFactor = convertReshadeBlendFactor(pass.dest_alpha_blend_factor[i]);
-                colorBlendAttachment.alphaBlendOp        = convertReshadeBlendOp(pass.alpha_blend_op[i]);
+                colorBlendAttachment.srcColorBlendFactor = convertReShadeBlendFactor(pass.source_color_blend_factor[i]);
+                colorBlendAttachment.dstColorBlendFactor = convertReShadeBlendFactor(pass.dest_color_blend_factor[i]);
+                colorBlendAttachment.colorBlendOp        = convertReShadeBlendOp(pass.color_blend_op[i]);
+                colorBlendAttachment.srcAlphaBlendFactor = convertReShadeBlendFactor(pass.source_alpha_blend_factor[i]);
+                colorBlendAttachment.dstAlphaBlendFactor = convertReShadeBlendFactor(pass.dest_alpha_blend_factor[i]);
+                colorBlendAttachment.alphaBlendOp        = convertReShadeBlendOp(pass.alpha_blend_op[i]);
                 colorBlendAttachment.colorWriteMask      = pass.render_target_write_mask[i];
 
                 attachmentBlendStates.push_back(colorBlendAttachment);
@@ -755,10 +755,10 @@ namespace vkBasalt
             depthStencilStateCreateInfo.depthCompareOp        = VK_COMPARE_OP_ALWAYS;
             depthStencilStateCreateInfo.depthBoundsTestEnable = VK_FALSE;
             depthStencilStateCreateInfo.stencilTestEnable     = pass.stencil_enable;
-            depthStencilStateCreateInfo.front.failOp          = convertReshadeStencilOp(pass.stencil_fail_op);
-            depthStencilStateCreateInfo.front.passOp          = convertReshadeStencilOp(pass.stencil_pass_op);
-            depthStencilStateCreateInfo.front.depthFailOp     = convertReshadeStencilOp(pass.stencil_depth_fail_op);
-            depthStencilStateCreateInfo.front.compareOp       = convertReshadeCompareOp(pass.stencil_comparison_func);
+            depthStencilStateCreateInfo.front.failOp          = convertReShadeStencilOp(pass.stencil_fail_op);
+            depthStencilStateCreateInfo.front.passOp          = convertReShadeStencilOp(pass.stencil_pass_op);
+            depthStencilStateCreateInfo.front.depthFailOp     = convertReShadeStencilOp(pass.stencil_depth_fail_op);
+            depthStencilStateCreateInfo.front.compareOp       = convertReShadeCompareOp(pass.stencil_comparison_func);
             depthStencilStateCreateInfo.front.compareMask     = pass.stencil_read_mask;
             depthStencilStateCreateInfo.front.writeMask       = pass.stencil_write_mask;
             depthStencilStateCreateInfo.front.reference       = pass.stencil_reference_value;
@@ -796,10 +796,10 @@ namespace vkBasalt
             Logger::debug("vertex   entry: " + pass.vs_entry_point);
             Logger::debug("fragment entry: " + pass.ps_entry_point);
         }
-        Logger::debug("finished creating Reshade effect");
+        Logger::debug("finished creating ReShade effect");
     }
 
-    void ReshadeEffect::updateEffect(const vkroots::VkDeviceDispatch* pDispatch)
+    void ReShadeEffect::updateEffect(const vkroots::VkDeviceDispatch* pDispatch)
     {
         if (bufferSize)
         {
@@ -814,7 +814,7 @@ namespace vkBasalt
         }
     }
 
-    void ReshadeEffect::useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView)
+    void ReShadeEffect::useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView)
     {
         std::vector<std::string> depthTextureNames;
 
@@ -871,9 +871,9 @@ namespace vkBasalt
             }
         }
     }
-    void ReshadeEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
+    void ReShadeEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {
-        Logger::debug("applying ReshadeEffect to command buffer" + convertToString(commandBuffer));
+        Logger::debug("applying ReShadeEffect to command buffer" + convertToString(commandBuffer));
         // Used to make the Image accessable by the shader
         VkImageMemoryBarrier memoryBarrier;
         memoryBarrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1030,9 +1030,9 @@ namespace vkBasalt
         Logger::debug("after the second pipeline barrier");
     }
 
-    ReshadeEffect::~ReshadeEffect()
+    ReShadeEffect::~ReShadeEffect()
     {
-        Logger::debug("destroying ReshadeEffect" + convertToString(this));
+        Logger::debug("destroying ReShadeEffect" + convertToString(this));
         for (auto& pipeline : graphicsPipelines)
         {
             pDispatch->DestroyPipeline(pLogicalDevice->device, pipeline, nullptr);
@@ -1146,7 +1146,7 @@ namespace vkBasalt
         }
     }
 
-    void ReshadeEffect::createReshadeModule()
+    void ReShadeEffect::createReShadeModule()
     {
         reshadefx::preprocessor preprocessor;
         preprocessor.add_macro_definition("__RESHADE__", std::to_string(INT_MAX));
@@ -1221,7 +1221,7 @@ namespace vkBasalt
         Logger::debug("created reshade shaderModule");
     }
 
-    auto ReshadeEffect::convertReshadeFormat(reshadefx::texture_format texFormat) -> VkFormat
+    auto ReShadeEffect::convertReShadeFormat(reshadefx::texture_format texFormat) -> VkFormat
     {
         switch (texFormat)
         {
@@ -1241,7 +1241,7 @@ namespace vkBasalt
         }
     }
 
-    auto ReshadeEffect::convertReshadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp
+    auto ReShadeEffect::convertReShadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp
     {
         switch (compareOp)
         {
@@ -1257,7 +1257,7 @@ namespace vkBasalt
         }
     }
 
-    auto ReshadeEffect::convertReshadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp
+    auto ReShadeEffect::convertReShadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp
     {
         switch (stencilOp)
         {
@@ -1273,7 +1273,7 @@ namespace vkBasalt
         }
     }
 
-    auto ReshadeEffect::convertReshadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp
+    auto ReShadeEffect::convertReShadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp
     {
         switch (blendOp)
         {
@@ -1286,7 +1286,7 @@ namespace vkBasalt
         }
     }
 
-    auto ReshadeEffect::convertReshadeBlendFactor(reshadefx::blend_factor blendFactor) -> VkBlendFactor
+    auto ReShadeEffect::convertReShadeBlendFactor(reshadefx::blend_factor blendFactor) -> VkBlendFactor
     {
         switch (blendFactor)
         {
@@ -1303,4 +1303,4 @@ namespace vkBasalt
             default: return VK_BLEND_FACTOR_ZERO;
         }
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

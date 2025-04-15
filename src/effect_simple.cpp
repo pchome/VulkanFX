@@ -11,7 +11,7 @@
 #include "sampler.hpp"
 #include "util.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     SimpleEffect::SimpleEffect()
     {
@@ -185,4 +185,4 @@ namespace vkBasalt
         Logger::debug("after DestroyImageView");
         pDispatch->DestroySampler(pLogicalDevice->device, sampler, nullptr);
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

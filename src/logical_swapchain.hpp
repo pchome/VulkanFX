@@ -6,7 +6,7 @@
 #include "effect.hpp"
 
 
-namespace vkBasalt
+namespace VulkanFX
 {
     // for each swapchain, we have the Images and the other stuff we need to execute the compute shader
     struct LogicalSwapchain
@@ -27,6 +27,6 @@ namespace vkBasalt
 
         void destroy(const vkroots::VkDeviceDispatch* pDispatch);
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // LOGICAL_SWAPCHAIN_HPP_INCLUDED

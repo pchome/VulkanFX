@@ -1,6 +1,6 @@
 #include "format.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto convertToSRGB(VkFormat format) -> VkFormat
     {
@@ -149,4 +149,4 @@ namespace vkBasalt
             default: return false;
         }
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

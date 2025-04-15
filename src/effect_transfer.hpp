@@ -5,7 +5,7 @@
 #include "effect.hpp"
 #include "config.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class TransferEffect : public Effect
     {
@@ -28,5 +28,5 @@ namespace vkBasalt
         VkFormat             format;
         Config*              pConfig;
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 #endif // EFFECT_TRANSFER_HPP_INCLUDED

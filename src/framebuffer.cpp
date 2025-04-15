@@ -1,6 +1,6 @@
 #include "framebuffer.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createFramebuffers(const vkroots::VkDeviceDispatch*      pDispatch,
                             LogicalDevice*                        pLogicalDevice,
@@ -34,4 +34,4 @@ namespace vkBasalt
         }
         return framebuffers;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

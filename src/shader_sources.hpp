@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 
-namespace vkBasalt
+namespace VulkanFX
 {
     const std::vector<uint32_t> cas_frag = {
 #include "cas.frag.h"
@@ -56,4 +56,4 @@ namespace vkBasalt
     const std::vector<uint32_t> smaa_neighbor_vert = {
 #include "smaa_neighbor.vert.h"
     };
-} // namespace vkBasalt
+} // namespace VulkanFX

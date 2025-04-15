@@ -1,6 +1,6 @@
 #include "effect_transfer.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     TransferEffect::TransferEffect(const vkroots::VkDeviceDispatch* pDispatch,
                                    LogicalDevice*                   pLogicalDevice,
@@ -86,4 +86,4 @@ namespace vkBasalt
     {
     }
 
-} // namespace vkBasalt
+} // namespace VulkanFX

@@ -6,7 +6,7 @@
 
 #include "effect.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
 
     auto allocateCommandBuffer(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count)
@@ -14,13 +14,13 @@ namespace vkBasalt
 
     void writeCommandBuffers(const vkroots::VkDeviceDispatch*               pDispatch,
                              LogicalDevice*                                 pLogicalDevice,
-                             std::vector<std::shared_ptr<vkBasalt::Effect>> effects,
+                             std::vector<std::shared_ptr<VulkanFX::Effect>> effects,
                              VkImage                                        depthImage,
                              VkImageView                                    depthImageView,
                              VkFormat                                       depthFormat,
                              std::vector<VkCommandBuffer>                   commandBuffers);
 
     auto createSemaphores(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count) -> std::vector<VkSemaphore>;
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // COMMAND_BUFFER_HPP_INCLUDED

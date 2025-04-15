@@ -1,3 +1,4 @@
+#pragma once
 #ifndef UTIL_HPP_INCLUDED
 #define UTIL_HPP_INCLUDED
 
@@ -5,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void addUniqueCString(std::vector<const char*>& stringVector, const char* addString);
 
@@ -26,12 +27,12 @@ namespace vkBasalt
     void outputInColor(std::string output, Color foreground = Color::defaultColor, Color background = Color::defaultColor);
 
     template<typename T>
-    std::string convertToString(T object)
+    auto convertToString(T object) -> std::string
     {
         std::stringstream ss;
         ss << object;
         return ss.str();
     }
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // UTIL_HPP_INCLUDED

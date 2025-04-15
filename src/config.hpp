@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <cstdlib>
 
-namespace vkBasalt
+namespace VulkanFX
 {
     class Config
     {
@@ -36,6 +36,6 @@ namespace vkBasalt
         void parseOption(const std::string& option, std::string& result);
         void parseOption(const std::string& option, std::vector<std::string>& result);
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // CONFIG_HPP_INCLUDED

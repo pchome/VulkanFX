@@ -3,7 +3,7 @@
 #define BUFFER_HPP_INCLUDED
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     void createBuffer(const vkroots::VkDeviceDispatch* pDispatch,
                       LogicalDevice*                   pLogicalDevice,

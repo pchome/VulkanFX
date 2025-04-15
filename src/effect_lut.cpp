@@ -11,7 +11,7 @@
 
 #include "shader_sources.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     LutEffect::LutEffect(const vkroots::VkDeviceDispatch* pDispatch,
                          LogicalDevice*                   pLogicalDevice,
@@ -119,4 +119,4 @@ namespace vkBasalt
         pDispatch->CmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &(lutDescriptorSet), 0, nullptr);
         SimpleEffect::applyEffect(pDispatch, imageIndex, commandBuffer);
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

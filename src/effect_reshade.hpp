@@ -9,12 +9,12 @@
 #include "config.hpp"
 #include "reshade_uniforms.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
-    class ReshadeEffect : public Effect
+    class ReShadeEffect : public Effect
     {
     public:
-        ReshadeEffect(const vkroots::VkDeviceDispatch* pDispatch,
+        ReShadeEffect(const vkroots::VkDeviceDispatch* pDispatch,
                       LogicalDevice*                   pLogicalDevice,
                       VkFormat                         format,
                       VkExtent2D                       imageExtent,
@@ -25,7 +25,7 @@ namespace vkBasalt
         void virtual applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer) override;
         void virtual updateEffect(const vkroots::VkDeviceDispatch* pDispatch) override;
         void virtual useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView) override;
-        virtual ~ReshadeEffect();
+        virtual ~ReShadeEffect();
 
     private:
         const vkroots::VkDeviceDispatch* pDispatch;
@@ -87,15 +87,15 @@ namespace vkBasalt
         uint32_t                 bufferSize;
         VkDescriptorSet          bufferDescriptorSet;
 
-        std::vector<std::shared_ptr<ReshadeUniform>> uniforms;
+        std::vector<std::shared_ptr<ReShadeUniform>> uniforms;
 
-        void createReshadeModule();
-        auto convertReshadeFormat(reshadefx::texture_format texFormat) -> VkFormat;
-        auto convertReshadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp;
-        auto convertReshadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp;
-        auto convertReshadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp;
-        auto convertReshadeBlendFactor(reshadefx::blend_factor blendFactor) -> VkBlendFactor;
+        void createReShadeModule();
+        auto convertReShadeFormat(reshadefx::texture_format texFormat) -> VkFormat;
+        auto convertReShadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp;
+        auto convertReShadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp;
+        auto convertReShadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp;
+        auto convertReShadeBlendFactor(reshadefx::blend_factor blendFactor) -> VkBlendFactor;
     };
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // EFFECT_RESHADE_HPP_INCLUDED

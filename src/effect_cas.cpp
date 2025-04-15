@@ -3,7 +3,7 @@
 
 #include "shader_sources.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     CasEffect::CasEffect(const vkroots::VkDeviceDispatch* pDispatch,
                          LogicalDevice*                   pLogicalDevice,
@@ -38,4 +38,4 @@ namespace vkBasalt
     CasEffect::~CasEffect()
     {
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

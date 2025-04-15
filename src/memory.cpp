@@ -1,6 +1,6 @@
 #include "memory.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto findMemoryTypeIndex(const vkroots::VkDeviceDispatch* pDispatch,
                              LogicalDevice*                   pLogicalDevice,
@@ -21,4 +21,4 @@ namespace vkBasalt
         Logger::err("Found no correct memory type");
         return 0x70AD;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

@@ -6,11 +6,11 @@ add_project_arguments('-fvisibility-inlines-hidden',  language: ['cpp'])
 vulkanfx_include_path = ''
 
 lib_dir = get_option('libdir')
-ld_lib_dir_vkbasalt = ''
+ld_lib_dir_vulkanfx = ''
 
-if get_option('append_libdir_vkbasalt')
-    lib_dir = join_paths(lib_dir, 'vkbasalt')
-    ld_lib_dir_vkbasalt = get_option('prefix') + '/$LIB/vkbasalt/'
+if get_option('append_libdir_vulkanfx')
+    lib_dir = join_paths(lib_dir, 'vulkanfx')
+    ld_lib_dir_vulkanfx = get_option('prefix') + '/$LIB/vulkanfx/'
 endif
 
 if get_option('with_so')

@@ -6,7 +6,7 @@
 #include <vector>
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createGraphicsPipelineLayout(const vkroots::VkDeviceDispatch*   pDispatch,
                                       LogicalDevice*                     pLogicalDevice,
@@ -25,6 +25,6 @@ namespace vkBasalt
                                 VkPipelineLayout                 pipelineLayout,
                                 bool                             flip = false) -> VkPipeline;
 
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // GRAPHICS_PIPELINE_HPP_INCLUDED

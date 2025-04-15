@@ -1,6 +1,6 @@
 #include "graphics_pipeline.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createGraphicsPipelineLayout(const vkroots::VkDeviceDispatch*   pDispatch,
                                       LogicalDevice*                     pLogicalDevice,
@@ -181,4 +181,4 @@ namespace vkBasalt
 
         return pipeline;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

@@ -5,7 +5,7 @@
 #include <cstring>
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     auto createImages(const vkroots::VkDeviceDispatch* pDispatch,
                       LogicalDevice*                   pLogicalDevice,
@@ -34,6 +34,6 @@ namespace vkBasalt
                          VkImage                          image,
                          VkExtent3D                       extent,
                          uint32_t                         mipLevels);
-} // namespace vkBasalt
+} // namespace VulkanFX
 
 #endif // IMAGE_HPP_INCLUDED

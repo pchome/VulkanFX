@@ -1,12 +1,12 @@
 #include "descriptor_set.hpp"
 #include "vulkan_include.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
 
-    VkDescriptorPool createDescriptorPool(const vkroots::VkDeviceDispatch*         pDispatch,
-                                          LogicalDevice*                           pLogicalDevice,
-                                          const std::vector<VkDescriptorPoolSize>& poolSizes)
+    auto createDescriptorPool(const vkroots::VkDeviceDispatch*         pDispatch,
+                              LogicalDevice*                           pLogicalDevice,
+                              const std::vector<VkDescriptorPoolSize>& poolSizes) -> VkDescriptorPool
     {
         uint32_t setCount = 0;
 
@@ -28,7 +28,7 @@ namespace vkBasalt
         return descriptorPool;
     }
 
-    VkDescriptorSetLayout createUniformBufferDescriptorSetLayout(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice)
+    auto createUniformBufferDescriptorSetLayout(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice) -> VkDescriptorSetLayout
     {
         VkDescriptorSetLayout descriptorSetLayout;
 
@@ -52,11 +52,11 @@ namespace vkBasalt
         return descriptorSetLayout;
     }
 
-    VkDescriptorSet writeBufferDescriptorSet(const vkroots::VkDeviceDispatch* pDispatch,
-                                             LogicalDevice*                   pLogicalDevice,
-                                             VkDescriptorPool                 descriptorPool,
-                                             VkDescriptorSetLayout            descriptorSetLayout,
-                                             VkBuffer                         buffer)
+    auto writeBufferDescriptorSet(const vkroots::VkDeviceDispatch* pDispatch,
+                                  LogicalDevice*                   pLogicalDevice,
+                                  VkDescriptorPool                 descriptorPool,
+                                  VkDescriptorSetLayout            descriptorSetLayout,
+                                  VkBuffer                         buffer) -> VkDescriptorSet
     {
         VkDescriptorSet descriptorSet;
 
@@ -94,8 +94,8 @@ namespace vkBasalt
         return descriptorSet;
     }
 
-    VkDescriptorSetLayout
-    createImageSamplerDescriptorSetLayout(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count)
+    auto createImageSamplerDescriptorSetLayout(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, uint32_t count)
+        -> VkDescriptorSetLayout
     {
         VkDescriptorSetLayout descriptorSetLayout;
 
@@ -123,12 +123,12 @@ namespace vkBasalt
         return descriptorSetLayout;
     }
 
-    std::vector<VkDescriptorSet> allocateAndWriteImageSamplerDescriptorSets(const vkroots::VkDeviceDispatch*      pDispatch,
-                                                                            LogicalDevice*                        pLogicalDevice,
-                                                                            VkDescriptorPool                      descriptorPool,
-                                                                            VkDescriptorSetLayout                 descriptorSetLayout,
-                                                                            std::vector<VkSampler>                samplers,
-                                                                            std::vector<std::vector<VkImageView>> imageViewsVectors)
+    auto allocateAndWriteImageSamplerDescriptorSets(const vkroots::VkDeviceDispatch*      pDispatch,
+                                                    LogicalDevice*                        pLogicalDevice,
+                                                    VkDescriptorPool                      descriptorPool,
+                                                    VkDescriptorSetLayout                 descriptorSetLayout,
+                                                    std::vector<VkSampler>                samplers,
+                                                    std::vector<std::vector<VkImageView>> imageViewsVectors) -> std::vector<VkDescriptorSet>
     {
         std::vector<VkDescriptorSet> descriptorSets(imageViewsVectors[0].size());
 
@@ -181,4 +181,4 @@ namespace vkBasalt
         }
         return descriptorSets;
     }
-} // namespace vkBasalt
+} // namespace VulkanFX

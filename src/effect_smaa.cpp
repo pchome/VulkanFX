@@ -16,7 +16,7 @@
 #include "SearchTex.h"
 #include "shader_sources.hpp"
 
-namespace vkBasalt
+namespace VulkanFX
 {
     SmaaEffect::SmaaEffect(const vkroots::VkDeviceDispatch* pDispatch,
                            LogicalDevice*                   pLogicalDevice,
@@ -380,4 +380,4 @@ namespace vkBasalt
 
         pDispatch->DestroySampler(pLogicalDevice->device, sampler, nullptr);
     }
-} // namespace vkBasalt
+} // namespace VulkanFX
