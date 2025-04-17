@@ -109,10 +109,9 @@ namespace VulkanFX
     LutEffect::~LutEffect()
     {
         pDispatch->DestroyImageView(pLogicalDevice->device, lutImageView, nullptr);
-        pDispatch->DestroyImage(pLogicalDevice->device, lutImage, nullptr);
         pDispatch->DestroyDescriptorSetLayout(pLogicalDevice->device, lutDescriptorSetLayout, nullptr);
         pDispatch->DestroyDescriptorPool(pLogicalDevice->device, lutDescriptorPool, nullptr);
-        pDispatch->FreeMemory(pLogicalDevice->device, lutMemory, nullptr);
+        vmaDestroyImage(pLogicalDevice->allocator, lutImage, lutMemory);
     }
     void LutEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {

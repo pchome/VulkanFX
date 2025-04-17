@@ -22,7 +22,7 @@ namespace VulkanFX
 
     private:
         VkImage               lutImage;
-        VkDeviceMemory        lutMemory;
+        VmaAllocation         lutMemory;
         VkImageView           lutImageView;
         VkDescriptorSetLayout lutDescriptorSetLayout;
         VkDescriptorPool      lutDescriptorPool;

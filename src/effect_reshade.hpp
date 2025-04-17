@@ -69,7 +69,7 @@ namespace VulkanFX
         Config*                               pConfig;
         std::string                           effectName;
         reshadefx::effect_module              module;
-        std::vector<VkDeviceMemory>           textureMemory;
+        std::vector<VmaAllocation>            textureMemory;
 
         VkFormat    inputOutputFormatUNORM;
         VkFormat    inputOutputFormatSRGB;
@@ -83,7 +83,7 @@ namespace VulkanFX
         std::vector<VkImageView> backBufferImageViewsUNORM;
         std::vector<VkImageView> backBufferImageViewsSRGB;
         VkBuffer                 stagingBuffer;
-        VkDeviceMemory           stagingBufferMemory;
+        VmaAllocation            stagingBufferMemory;
         uint32_t                 bufferSize;
         VkDescriptorSet          bufferDescriptorSet;
 
