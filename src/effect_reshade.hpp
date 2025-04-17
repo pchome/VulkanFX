@@ -22,9 +22,9 @@ namespace VulkanFX
                       std::vector<VkImage>             outputImages,
                       Config*                          pConfig,
                       std::string                      effectName);
-        void virtual applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer) override;
-        void virtual updateEffect(const vkroots::VkDeviceDispatch* pDispatch) override;
-        void virtual useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView) override;
+        void applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer) override;
+        void updateEffect(const vkroots::VkDeviceDispatch* pDispatch) override;
+        void useDepthImage(const vkroots::VkDeviceDispatch* pDispatch, VkImageView depthImageView) override;
         virtual ~ReShadeEffect();
 
     private:
@@ -90,7 +90,7 @@ namespace VulkanFX
         std::vector<std::shared_ptr<ReShadeUniform>> uniforms;
 
         void createReShadeModule();
-        auto convertReShadeFormat(reshadefx::texture_format texFormat) -> VkFormat;
+        auto convertReShadeFormat(reshadefx::texture_format texFormat, VkComponentMapping* components = nullptr) -> VkFormat;
         auto convertReShadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp;
         auto convertReShadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp;
         auto convertReShadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp;

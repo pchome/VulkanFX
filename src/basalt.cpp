@@ -238,7 +238,10 @@ namespace VulkanFX
                                      .imageCount          = 0,
                                  });
 
-            pConfig = std::make_shared<VulkanFX::Config>();
+            if (pConfig == nullptr)
+            {
+                pConfig = std::make_shared<VulkanFX::Config>();
+            }
 
             return result;
         }
@@ -355,6 +358,8 @@ namespace VulkanFX
 
             auto effectStrings = pConfig->getOption<std::vector<std::string>>("effects", {"cas"});
 
+            // TODO: invalid effect names (expecting blah = <filename> for e.g. cas:blah)
+            //       validate and skip such options.
             // create 1 more set of images when we can't use the swapchain it self
             uint32_t fakeImageCount = pLogicalSwapchain->imageCount * (effectStrings.size() + !pLogicalDevice->supportsMutableFormat);
 
@@ -426,6 +431,8 @@ namespace VulkanFX
                 else
                 {
 #if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
+                    if (!pConfig->getOption<std::string>(effectStrings[i]).empty())
+                    {
                     pLogicalSwapchain->effects.push_back(std::shared_ptr<Effect>(new ReShadeEffect(pDispatch,
                                                                                                    pLogicalDevice.get(),
                                                                                                    pLogicalSwapchain->format,
@@ -435,6 +442,11 @@ namespace VulkanFX
                                                                                                    pConfig.get(),
                                                                                                    effectStrings[i])));
                     Logger::debug("created ReShadeEffect");
+                    }
+                    else
+                    {
+                        Logger::err("wrong effect: " + effectStrings[i]);
+                    }
 #else
                     Logger::debug("ReShadeEffects disabled");
 #endif

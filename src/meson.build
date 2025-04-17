@@ -1,6 +1,8 @@
 subdir('shader')
 
 reshade_dep = dependency('ReShadeFX')
+reshade_spirv_dep = dependency('ReShadeFX-spirv')
+reshade_type_convert_dep = dependency('ReShadeFX-vulkan-type-convert')
 vkroots_dep = dependency('vkroots')
 stb_dep = dependency('stb')
 
@@ -75,7 +77,7 @@ shared_library('VkLayer_VulkanFX_default', vulkanfx_src, reshadefx_src,
     cpp_args: ['-DDISABLE_DEPTH_CAPTURE=1'],
     link_with: [keyboard_input_x11_lib, simple_effects_lib],
     include_directories : vulkanfx_include_path,
-    dependencies : [x11_dep, reshade_dep, vkroots_dep, stb_dep],
+    dependencies : [x11_dep, reshade_dep, reshade_spirv_dep, reshade_type_convert_dep, vkroots_dep, stb_dep],
     gnu_symbol_visibility: 'hidden',
     install : true,
     install_dir : lib_dir)
@@ -83,7 +85,7 @@ shared_library('VkLayer_VulkanFX_default', vulkanfx_src, reshadefx_src,
 shared_library('VkLayer_VulkanFX_depth', vulkanfx_src, reshadefx_src,
     link_with: [keyboard_input_x11_lib, simple_effects_lib],
     include_directories : vulkanfx_include_path,
-    dependencies : [x11_dep, reshade_dep, vkroots_dep, stb_dep],
+    dependencies : [x11_dep, reshade_dep, reshade_spirv_dep, reshade_type_convert_dep, vkroots_dep, stb_dep],
     gnu_symbol_visibility: 'hidden',
     install : true,
     install_dir : lib_dir)

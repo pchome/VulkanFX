@@ -1,5 +1,6 @@
 #include "effect_reshade.hpp"
 
+#include <algorithm>
 #include <cstring>
 #include <climits>
 #include <cstdlib>
@@ -11,6 +12,10 @@
 #include <reshade/effect_codegen.hpp>
 #include <reshade/effect_preprocessor.hpp>
 #include <reshade/effect_parser.hpp>
+
+#include <reshade/reshade_api_pipeline.hpp>
+#include <reshade/reshade_api_resource.hpp>
+#include <reshade/vulkan_impl_type_convert.hpp>
 
 #include "image_view.hpp"
 #include "descriptor_set.hpp"
@@ -380,16 +385,16 @@ namespace VulkanFX
             backBufferImageViewsSRGB  = createImageViews(pDispatch, pLogicalDevice, inputOutputFormatSRGB, backBufferImages);
             backBufferImageViewsUNORM = createImageViews(pDispatch, pLogicalDevice, inputOutputFormatUNORM, backBufferImages);
 
-            std::replace(imageViewVector.begin(), imageViewVector.end(), inputImageViewsSRGB, backBufferImageViewsSRGB);
-            std::replace(imageViewVector.begin(), imageViewVector.end(), inputImageViewsUNORM, backBufferImageViewsUNORM);
+            std::ranges::replace(imageViewVector, inputImageViewsSRGB, backBufferImageViewsSRGB);
+            std::ranges::replace(imageViewVector, inputImageViewsUNORM, backBufferImageViewsUNORM);
 
             backBufferDescriptorSets = allocateAndWriteImageSamplerDescriptorSets(
                 pDispatch, pLogicalDevice, descriptorPool, imageSamplerDescriptorSetLayout, samplers, imageViewVector);
         }
         if (outputWrites > 2)
         {
-            std::replace(imageViewVector.begin(), imageViewVector.end(), backBufferImageViewsSRGB, outputImageViewsSRGB);
-            std::replace(imageViewVector.begin(), imageViewVector.end(), backBufferImageViewsUNORM, outputImageViewsUNORM);
+            std::ranges::replace(imageViewVector, backBufferImageViewsSRGB, outputImageViewsSRGB);
+            std::ranges::replace(imageViewVector, backBufferImageViewsUNORM, outputImageViewsUNORM);
             outputDescriptorSets = allocateAndWriteImageSamplerDescriptorSets(
                 pDispatch, pLogicalDevice, descriptorPool, imageSamplerDescriptorSetLayout, samplers, imageViewVector);
         }
@@ -672,8 +677,9 @@ namespace VulkanFX
             vertexInputCreateInfo.vertexAttributeDescriptionCount = 0;
             vertexInputCreateInfo.pVertexAttributeDescriptions    = nullptr;
 
-            VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-
+            // VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+            VkPrimitiveTopology topology = reshade::vulkan::convert_primitive_topology(static_cast<reshade::api::primitive_topology>(pass.topology));
+            /*
             switch (pass.topology)
             {
                 case reshadefx::primitive_topology::point_list: topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST; break;
@@ -683,6 +689,7 @@ namespace VulkanFX
                 case reshadefx::primitive_topology::triangle_strip: topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP; break;
                 default: Logger::err("unsupported primitiv type" + convertToString((uint8_t) pass.topology)); break;
             }
+            */
 
             VkPipelineInputAssemblyStateCreateInfo inputAssemblyCreateInfo;
             inputAssemblyCreateInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -1159,14 +1166,17 @@ namespace VulkanFX
         preprocessor.add_macro_definition("BUFFER_RCP_HEIGHT", "(1.0 / BUFFER_HEIGHT)");
         preprocessor.add_macro_definition("BUFFER_COLOR_DEPTH", (inputOutputFormatUNORM == VK_FORMAT_A2R10G10B10_UNORM_PACK32) ? "10" : "8");
         preprocessor.add_macro_definition("BUFFER_COLOR_BIT_DEPTH", "8"); // 16 for HDR (?)
-        preprocessor.add_macro_definition(
-            "BUFFER_COLOR_SPACE",
-            "1"); // (0 = unknown, 1 = sRGB, 2 = scRGB, 3 = HDR10 ST2084, 4 = HDR10 HLG) // see eg. VK_COLOR_SPACE_HDR10_ST2084_EXT
+        // (0 = unknown, 1 = sRGB, 2 = scRGB, 3 = HDR10 ST2084, 4 = HDR10 HLG) // see e.g. VK_COLOR_SPACE_HDR10_ST2084_EXT
+        preprocessor.add_macro_definition("BUFFER_COLOR_SPACE", "1");
+
         preprocessor.add_include_path(pConfig->getOption<std::string>("reshadeIncludePath"));
-        if (!preprocessor.append_file(pConfig->getOption<std::string>(effectName)))
+
+        auto fxFile = pConfig->getOption<std::string>(effectName);
+        if (fxFile.empty() || !preprocessor.append_file(fxFile))
         {
-            Logger::err("failed to load shader file: " + pConfig->getOption<std::string>(effectName));
+            Logger::err(effectName + ": failed to load shader file: '" + fxFile + "'");
             Logger::err("Does the filepath exist and does it not include spaces?");
+            return;
         }
 
         reshadefx::parser parser;
@@ -1220,8 +1230,10 @@ namespace VulkanFX
         Logger::debug("created reshade shaderModule");
     }
 
-    auto ReShadeEffect::convertReShadeFormat(reshadefx::texture_format texFormat) -> VkFormat
+    auto ReShadeEffect::convertReShadeFormat(reshadefx::texture_format texFormat, VkComponentMapping* components) -> VkFormat
     {
+        return reshade::vulkan::convert_format(static_cast<reshade::api::format>(texFormat), components);
+        /*
         switch (texFormat)
         {
             case reshadefx::texture_format::r8: return VK_FORMAT_R8_UNORM;
@@ -1238,10 +1250,13 @@ namespace VulkanFX
             case reshadefx::texture_format::rgb10a2: return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
             default: return VK_FORMAT_UNDEFINED;
         }
+        */
     }
 
     auto ReShadeEffect::convertReShadeCompareOp(reshadefx::stencil_func compareOp) -> VkCompareOp
     {
+        return reshade::vulkan::convert_compare_op(static_cast<reshade::api::compare_op>(compareOp));
+        /*
         switch (compareOp)
         {
             case reshadefx::stencil_func::never: return VK_COMPARE_OP_NEVER;
@@ -1254,10 +1269,13 @@ namespace VulkanFX
             case reshadefx::stencil_func::always:
             default: return VK_COMPARE_OP_ALWAYS;
         }
+        */
     }
 
     auto ReShadeEffect::convertReShadeStencilOp(reshadefx::stencil_op stencilOp) -> VkStencilOp
     {
+        return reshade::vulkan::convert_stencil_op(static_cast<reshade::api::stencil_op>(stencilOp));
+        /*
         switch (stencilOp)
         {
             case reshadefx::stencil_op::zero: return VK_STENCIL_OP_ZERO;
@@ -1270,10 +1288,13 @@ namespace VulkanFX
             case reshadefx::stencil_op::decrement: return VK_STENCIL_OP_DECREMENT_AND_WRAP;
             default: return VK_STENCIL_OP_KEEP;
         }
+        */
     }
 
     auto ReShadeEffect::convertReShadeBlendOp(reshadefx::blend_op blendOp) -> VkBlendOp
     {
+        return reshade::vulkan::convert_blend_op(static_cast<reshade::api::blend_op>(blendOp));
+        /*
         switch (blendOp)
         {
             case reshadefx::blend_op::add: return VK_BLEND_OP_ADD;
@@ -1283,10 +1304,13 @@ namespace VulkanFX
             case reshadefx::blend_op::max: return VK_BLEND_OP_MAX;
             default: return VK_BLEND_OP_ADD;
         }
+        */
     }
 
     auto ReShadeEffect::convertReShadeBlendFactor(reshadefx::blend_factor blendFactor) -> VkBlendFactor
     {
+        return reshade::vulkan::convert_blend_factor(static_cast<reshade::api::blend_factor>(blendFactor));
+        /*
         switch (blendFactor)
         {
             case reshadefx::blend_factor::zero: return VK_BLEND_FACTOR_ZERO;
@@ -1301,5 +1325,6 @@ namespace VulkanFX
             case reshadefx::blend_factor::one_minus_dest_color: return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
             default: return VK_BLEND_FACTOR_ZERO;
         }
+        */
     }
 } // namespace VulkanFX
