@@ -11,7 +11,7 @@ namespace VulkanFX
                       VkBufferUsageFlags               usage,
                       VkMemoryPropertyFlags            properties,
                       VkBuffer&                        buffer,
-                      VkDeviceMemory&                  bufferMemory);
+                      VmaAllocation&                   bufferMemory);
 }
 
 #endif // BUFFER_HPP_INCLUDED

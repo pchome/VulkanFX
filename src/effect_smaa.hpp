@@ -56,9 +56,9 @@ namespace VulkanFX
         VkPipeline                       neighborPipeline;
         VkExtent2D                       imageExtent;
         VkFormat                         format;
-        VkDeviceMemory                   imageMemory;
-        VkDeviceMemory                   areaMemory;
-        VkDeviceMemory                   searchMemory;
+        VmaAllocation                    imageMemory;
+        VmaAllocation                    areaMemory;
+        VmaAllocation                    searchMemory;
         VkSampler                        sampler;
 
         Config* pConfig;

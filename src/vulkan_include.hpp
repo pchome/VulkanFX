@@ -5,6 +5,7 @@
 #define VK_NO_PROTOTYPES
 
 #pragma GCC system_header
+#include "vma_usage.hpp"
 #include <vkroots.h>
 
 #include "logger.hpp"
@@ -21,6 +22,7 @@ namespace VulkanFX
 {
     struct LogicalDevice
     {
+        VmaAllocator             allocator;
         VkDevice                 device;
         VkPhysicalDevice         physicalDevice;
         VkInstance               instance;

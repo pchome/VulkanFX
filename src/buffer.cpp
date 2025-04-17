@@ -1,5 +1,4 @@
 #include "buffer.hpp"
-#include "memory.hpp"
 
 namespace VulkanFX
 {
@@ -9,7 +8,7 @@ namespace VulkanFX
                       VkBufferUsageFlags               usage,
                       VkMemoryPropertyFlags            properties,
                       VkBuffer&                        buffer,
-                      VkDeviceMemory&                  bufferMemory)
+                      VmaAllocation&                   bufferMemory)
     {
         VkBufferCreateInfo bufferInfo = {};
 
@@ -18,22 +17,13 @@ namespace VulkanFX
         bufferInfo.usage       = usage;
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        VkResult result = pDispatch->CreateBuffer(pLogicalDevice->device, &bufferInfo, nullptr, &buffer);
-        ASSERT_VULKAN(result);
+        VmaAllocationCreateInfo allocInfo = {};
+        allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
+        allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        allocInfo.preferredFlags = properties;
 
-        VkMemoryRequirements memRequirements;
-        pDispatch->GetBufferMemoryRequirements(pLogicalDevice->device, buffer, &memRequirements);
 
-        VkMemoryAllocateInfo allocInfo = {};
-
-        allocInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.allocationSize  = memRequirements.size;
-        allocInfo.memoryTypeIndex = findMemoryTypeIndex(pDispatch, pLogicalDevice, memRequirements.memoryTypeBits, properties);
-
-        result = pDispatch->AllocateMemory(pLogicalDevice->device, &allocInfo, nullptr, &bufferMemory);
-        ASSERT_VULKAN(result);
-
-        result = pDispatch->BindBufferMemory(pLogicalDevice->device, buffer, bufferMemory, 0);
+        VkResult result = vmaCreateBuffer(pLogicalDevice->allocator, &bufferInfo, &allocInfo, &buffer, &bufferMemory, nullptr);
         ASSERT_VULKAN(result);
     }
 

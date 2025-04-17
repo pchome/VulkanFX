@@ -14,7 +14,7 @@ namespace VulkanFX
                       VkFormat                         format,
                       VkImageUsageFlags                usage,
                       VkMemoryPropertyFlags            properties,
-                      VkDeviceMemory&                  imageMemory,
+                      VmaAllocation&                   imageMemory,
                       uint32_t                         mipLevels = 1) -> std::vector<VkImage>;
 
     void uploadToImage(const vkroots::VkDeviceDispatch* pDispatch,

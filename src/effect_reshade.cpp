@@ -804,13 +804,13 @@ namespace VulkanFX
         if (bufferSize)
         {
             void*    data;
-            VkResult result = pDispatch->MapMemory(pLogicalDevice->device, stagingBufferMemory, 0, bufferSize, 0, &data);
+            VkResult result = vmaMapMemory(pLogicalDevice->allocator, stagingBufferMemory, &data);
             ASSERT_VULKAN(result);
             for (auto& uniform : uniforms)
             {
                 uniform->update(data);
             }
-            pDispatch->UnmapMemory(pLogicalDevice->device, stagingBufferMemory);
+            vmaUnmapMemory(pLogicalDevice->allocator, stagingBufferMemory);
         }
     }
 
@@ -1040,8 +1040,7 @@ namespace VulkanFX
 
         if (bufferSize)
         {
-            pDispatch->FreeMemory(pLogicalDevice->device, stagingBufferMemory, nullptr);
-            pDispatch->DestroyBuffer(pLogicalDevice->device, stagingBuffer, nullptr);
+            vmaDestroyBuffer(pLogicalDevice->allocator, stagingBuffer, stagingBufferMemory);
         }
 
         pDispatch->DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
@@ -1142,7 +1141,7 @@ namespace VulkanFX
 
         for (auto& memory : textureMemory)
         {
-            pDispatch->FreeMemory(pLogicalDevice->device, memory, nullptr);
+            vmaFreeMemory(pLogicalDevice->allocator, memory);
         }
     }
 

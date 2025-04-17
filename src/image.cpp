@@ -1,5 +1,4 @@
 #include "image.hpp"
-#include "memory.hpp"
 #include "buffer.hpp"
 #include "format.hpp"
 
@@ -12,7 +11,7 @@ namespace VulkanFX
                       VkFormat                         format,
                       VkImageUsageFlags                usage,
                       VkMemoryPropertyFlags            properties,
-                      VkDeviceMemory&                  imageMemory,
+                      VmaAllocation&                   imageMemory,
                       uint32_t                         mipLevels) -> std::vector<VkImage>
     {
         std::vector<VkImage> images(count);
@@ -53,32 +52,14 @@ namespace VulkanFX
         imageCreateInfo.initialLayout         = VK_IMAGE_LAYOUT_UNDEFINED;
 
         VkResult result;
-        for (uint32_t i = 0; i < count; i++)
-        {
-            result = pDispatch->CreateImage(pLogicalDevice->device, &imageCreateInfo, nullptr, &(images[i]));
-            ASSERT_VULKAN(result);
-        }
-        // Allocate a bunch of memory for all images at one
-        VkMemoryRequirements memoryRequirements;
-        pDispatch->GetImageMemoryRequirements(pLogicalDevice->device, images[0], &memoryRequirements);
-
-        if (memoryRequirements.size % memoryRequirements.alignment != 0)
-        {
-            memoryRequirements.size = (memoryRequirements.size / memoryRequirements.alignment + 1) * memoryRequirements.alignment;
-        }
-
-        VkMemoryAllocateInfo memoryAllocateInfo;
-        memoryAllocateInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        memoryAllocateInfo.pNext           = nullptr;
-        memoryAllocateInfo.allocationSize  = memoryRequirements.size * count;
-        memoryAllocateInfo.memoryTypeIndex = findMemoryTypeIndex(pDispatch, pLogicalDevice, memoryRequirements.memoryTypeBits, properties);
-
-        result = pDispatch->AllocateMemory(pLogicalDevice->device, &memoryAllocateInfo, nullptr, &imageMemory);
-        ASSERT_VULKAN(result);
+        VmaAllocationCreateInfo memoryAllocateInfo = {};
+        memoryAllocateInfo.usage = VMA_MEMORY_USAGE_AUTO;
+        memoryAllocateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        memoryAllocateInfo.preferredFlags = properties;
 
         for (uint32_t i = 0; i < count; i++)
         {
-            result = pDispatch->BindImageMemory(pLogicalDevice->device, images[i], imageMemory, memoryRequirements.size * i);
+            result = vmaCreateImage(pLogicalDevice->allocator, &imageCreateInfo, &memoryAllocateInfo, &(images[i]), &imageMemory, nullptr);
             ASSERT_VULKAN(result);
         }
         return images;
@@ -94,7 +75,7 @@ namespace VulkanFX
     {
 
         VkBuffer       stagingBuffer;
-        VkDeviceMemory stagingMemory;
+        VmaAllocation stagingMemory;
 
         createBuffer(pDispatch,
                      pLogicalDevice,
@@ -103,11 +84,11 @@ namespace VulkanFX
                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                      stagingBuffer,
                      stagingMemory);
-        void*    data;
-        VkResult result = pDispatch->MapMemory(pLogicalDevice->device, stagingMemory, 0, size, 0, &data);
+        void*    data = nullptr;
+        VkResult result = vmaMapMemory(pLogicalDevice->allocator, stagingMemory, &data);
         ASSERT_VULKAN(result);
         std::memcpy(data, writeData, size);
-        pDispatch->UnmapMemory(pLogicalDevice->device, stagingMemory);
+        vmaUnmapMemory(pLogicalDevice->allocator, stagingMemory);
 
         VkCommandBufferAllocateInfo allocInfo = {};
 
@@ -182,8 +163,7 @@ namespace VulkanFX
         pDispatch->QueueWaitIdle(pLogicalDevice->queue);
 
         pDispatch->FreeCommandBuffers(pLogicalDevice->device, pLogicalDevice->commandPool, 1, &commandBuffer);
-        pDispatch->FreeMemory(pLogicalDevice->device, stagingMemory, nullptr);
-        pDispatch->DestroyBuffer(pLogicalDevice->device, stagingBuffer, nullptr);
+        vmaDestroyBuffer(pLogicalDevice->allocator, stagingBuffer, stagingMemory);
     }
 
     void changeImageLayout(const vkroots::VkDeviceDispatch* pDispatch, LogicalDevice* pLogicalDevice, std::vector<VkImage> images, uint32_t mipLevels)

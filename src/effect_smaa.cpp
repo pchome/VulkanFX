@@ -357,9 +357,6 @@ namespace VulkanFX
         pDispatch->DestroyShaderModule(pLogicalDevice->device, neignborFragmentModule, nullptr);
 
         pDispatch->DestroyDescriptorPool(pLogicalDevice->device, descriptorPool, nullptr);
-        pDispatch->FreeMemory(pLogicalDevice->device, imageMemory, nullptr);
-        pDispatch->FreeMemory(pLogicalDevice->device, areaMemory, nullptr);
-        pDispatch->FreeMemory(pLogicalDevice->device, searchMemory, nullptr);
         for (unsigned int i = 0; i < edgeFramebuffers.size(); i++)
         {
             pDispatch->DestroyFramebuffer(pLogicalDevice->device, edgeFramebuffers[i], nullptr);
@@ -374,9 +371,10 @@ namespace VulkanFX
         }
         Logger::debug("after DestroyImageView");
         pDispatch->DestroyImageView(pLogicalDevice->device, areaImageView, nullptr);
-        pDispatch->DestroyImage(pLogicalDevice->device, areaImage, nullptr);
         pDispatch->DestroyImageView(pLogicalDevice->device, searchImageView, nullptr);
-        pDispatch->DestroyImage(pLogicalDevice->device, searchImage, nullptr);
+        vmaDestroyImage(pLogicalDevice->allocator, areaImage, areaMemory);
+        vmaDestroyImage(pLogicalDevice->allocator, searchImage, searchMemory);
+        vmaFreeMemory(pLogicalDevice->allocator, imageMemory);
 
         pDispatch->DestroySampler(pLogicalDevice->device, sampler, nullptr);
     }
