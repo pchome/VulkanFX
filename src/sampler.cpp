@@ -1,4 +1,7 @@
 #include "sampler.hpp"
+#include <reshade/effect_module.hpp>
+#include <reshade/reshade_api_resource.hpp>
+#include <reshade/vulkan_impl_type_convert.hpp>
 
 namespace VulkanFX
 {
@@ -36,6 +39,32 @@ namespace VulkanFX
         -> VkSampler
     {
         VkSampler sampler;
+        VkSamplerCreateInfo samplerCreateInfo { VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO };
+            // .sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+            // .pNext                   = nullptr,
+            // .flags                   = 0,
+            // .anisotropyEnable        = VK_FALSE,
+            // .maxAnisotropy           = 16,
+            // .compareEnable           = VK_FALSE,
+            // .unnormalizedCoordinates = VK_FALSE,
+        // };
+        // TODO: try to use reshade::api directly
+        const reshade::api::sampler_desc tmp_map_to_api = {
+            .filter = static_cast<reshade::api::filter_mode>(samplerInfo.filter),
+            .address_u = static_cast<reshade::api::texture_address_mode>(samplerInfo.address_u),
+            .address_v = static_cast<reshade::api::texture_address_mode>(samplerInfo.address_v),
+            .address_w  = static_cast<reshade::api::texture_address_mode>(samplerInfo.address_w),
+            .mip_lod_bias = samplerInfo.lod_bias,
+            // .max_anisotropy = 1.0f, // default
+            .compare_op = reshade::api::compare_op::always,
+            .border_color = { 0.0f, 0.0f, 0.0f, 0.0f },
+            .min_lod = samplerInfo.min_lod,
+            .max_lod = samplerInfo.max_lod,
+        };
+
+        reshade::vulkan::convert_sampler_desc(tmp_map_to_api, samplerCreateInfo);
+        /*
+        VkSampler sampler;
 
         VkFilter            minFilter;
         VkFilter            magFilter;
@@ -61,12 +90,13 @@ namespace VulkanFX
         samplerCreateInfo.maxLod                  = samplerInfo.max_lod;
         samplerCreateInfo.borderColor             = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
         samplerCreateInfo.unnormalizedCoordinates = VK_FALSE;
-
+        */
         VkResult result = pDispatch->CreateSampler(pLogicalDevice->device, &samplerCreateInfo, nullptr, &sampler);
         ASSERT_VULKAN(result);
         return sampler;
     }
 
+    /*
     auto convertReShadeAddressMode(const reshadefx::texture_address_mode& addressMode) -> VkSamplerAddressMode
     {
         switch (addressMode)
@@ -133,5 +163,6 @@ namespace VulkanFX
                 // source/vulkan/vulkan_impl_type_convert.hpp
         }
     }
+    */
 #endif
 } // namespace VulkanFX

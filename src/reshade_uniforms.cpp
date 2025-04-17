@@ -18,7 +18,7 @@ namespace VulkanFX
             auto source = std::find_if(uniform.annotations.begin(), uniform.annotations.end(), [](const auto& a) {
                               return a.name == "source";
                           })->value.string_data;
-            Logger::debug(source);
+            Logger::debug("uniform: '" + source + "'"); // TODO: can be empty or unknown
             Logger::debug("size: " + std::to_string(uniform.size));
             Logger::debug("offset: " + std::to_string(uniform.offset));
         }
