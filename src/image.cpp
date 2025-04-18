@@ -54,7 +54,7 @@ namespace VulkanFX
         VkResult result;
         VmaAllocationCreateInfo memoryAllocateInfo = {};
         memoryAllocateInfo.usage = VMA_MEMORY_USAGE_AUTO;
-        memoryAllocateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        // memoryAllocateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         memoryAllocateInfo.preferredFlags = properties;
 
         for (uint32_t i = 0; i < count; i++)
@@ -84,11 +84,12 @@ namespace VulkanFX
                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                      stagingBuffer,
                      stagingMemory);
-        void*    data = nullptr;
-        VkResult result = vmaMapMemory(pLogicalDevice->allocator, stagingMemory, &data);
-        ASSERT_VULKAN(result);
-        std::memcpy(data, writeData, size);
-        vmaUnmapMemory(pLogicalDevice->allocator, stagingMemory);
+        // void*    data = nullptr;
+        // VkResult result = vmaMapMemory(pLogicalDevice->allocator, stagingMemory, &data);
+        // ASSERT_VULKAN(result);
+        // std::memcpy(data, writeData, size);
+        // vmaUnmapMemory(pLogicalDevice->allocator, stagingMemory);
+        vmaCopyMemoryToAllocation(pLogicalDevice->allocator, writeData, stagingMemory, 0, size);
 
         VkCommandBufferAllocateInfo allocInfo = {};
 
