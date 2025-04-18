@@ -131,8 +131,7 @@ namespace VulkanFX
             VkExtent3D textureExtent = {module.textures[i].width, module.textures[i].height, 1};
             // TODO handle mip map levels correctly
             // TODO handle pooled textures better
-            if (const auto source = std::find_if(
-                    module.textures[i].annotations.begin(), module.textures[i].annotations.end(), [](const auto& a) { return a.name == "source"; });
+            if (const auto source = std::ranges::find_if(module.textures[i].annotations, [](const auto& a) { return a.name == "source"; });
                 source == module.textures[i].annotations.end())
             {
                 textureMemory.push_back(VK_NULL_HANDLE);

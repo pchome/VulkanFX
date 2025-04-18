@@ -1,5 +1,6 @@
 #include "reshade_uniforms.hpp"
 
+#include <algorithm>
 #include <cstring>
 #include <ctime>
 #include <cstdlib>
@@ -15,12 +16,12 @@ namespace VulkanFX
     {
         for (auto& uniform : module.uniforms)
         {
-            auto source = std::find_if(uniform.annotations.begin(), uniform.annotations.end(), [](const auto& a) {
-                              return a.name == "source";
-                          })->value.string_data;
+            auto src_annotation = std::ranges::find_if(uniform.annotations, [](const auto& a) { return a.name == "source"; });
+            std::string source = src_annotation != uniform.annotations.end() ? src_annotation->value.string_data : "(empty)";
             Logger::debug("uniform: '" + source + "'"); // TODO: can be empty or unknown
-            Logger::debug("size: " + std::to_string(uniform.size));
-            Logger::debug("offset: " + std::to_string(uniform.offset));
+            Logger::debug("name:     " + uniform.name);
+            Logger::debug("size:     " + std::to_string(uniform.size));
+            Logger::debug("offset:   " + std::to_string(uniform.offset));
         }
     }
 
@@ -29,9 +30,12 @@ namespace VulkanFX
         std::vector<std::shared_ptr<ReShadeUniform>> uniforms;
         for (auto& uniform : module.uniforms)
         {
-            auto source = std::find_if(uniform.annotations.begin(), uniform.annotations.end(), [](const auto& a) {
-                              return a.name == "source";
-                          })->value.string_data;
+            auto src_annotation = std::ranges::find_if(uniform.annotations, [](const auto& a) { return a.name == "source"; });
+            if (src_annotation == uniform.annotations.end())
+            {
+                continue;
+            }
+            std::string source = src_annotation->value.string_data;
             if (source == "frametime")
             {
                 uniforms.push_back(std::shared_ptr<ReShadeUniform>(new FrameTimeUniform(uniform)));
@@ -83,7 +87,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     FrameTimeUniform::FrameTimeUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "frametime")
         {
             Logger::err("Tried to create a FrameTimeUniform from a non frametime uniform_info");
@@ -107,7 +111,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     FrameCountUniform::FrameCountUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "framecount")
         {
             Logger::err("Tried to create a FrameCountUniform from a non framecount uniform_info");
@@ -127,7 +131,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     DateUniform::DateUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "date")
         {
             Logger::err("Tried to create a DateUniform from a non date uniform_info");
@@ -154,7 +158,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     TimerUniform::TimerUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "timer")
         {
             Logger::err("Tried to create a TimerUniform from a non timer uniform_info");
@@ -177,32 +181,32 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     PingPongUniform::PingPongUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "pingpong")
         {
             Logger::err("Tried to create a PingPongUniform from a non pingpong uniform_info");
         }
         if (auto minAnnotation =
-                std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "min"; });
+                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "min"; });
             minAnnotation != uniformInfo.annotations.end())
         {
             min = minAnnotation->type.is_floating_point() ? minAnnotation->value.as_float[0] : static_cast<float>(minAnnotation->value.as_int[0]);
         }
         if (auto maxAnnotation =
-                std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "max"; });
+                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "max"; });
             maxAnnotation != uniformInfo.annotations.end())
         {
             max = maxAnnotation->type.is_floating_point() ? maxAnnotation->value.as_float[0] : static_cast<float>(maxAnnotation->value.as_int[0]);
         }
         if (auto smoothingAnnotation =
-                std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "smoothing"; });
+                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "smoothing"; });
             smoothingAnnotation != uniformInfo.annotations.end())
         {
             smoothing = smoothingAnnotation->type.is_floating_point() ? smoothingAnnotation->value.as_float[0]
                                                                       : static_cast<float>(smoothingAnnotation->value.as_int[0]);
         }
         if (auto stepAnnotation =
-                std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "step"; });
+                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "step"; });
             stepAnnotation != uniformInfo.annotations.end())
         {
             stepMin =
@@ -252,19 +256,19 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     RandomUniform::RandomUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "random")
         {
             Logger::err("Tried to create a RandomUniform from a non random uniform_info");
         }
         if (auto minAnnotation =
-                std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "min"; });
+                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "min"; });
             minAnnotation != uniformInfo.annotations.end())
         {
             min = minAnnotation->type.is_integral() ? minAnnotation->value.as_int[0] : static_cast<int>(minAnnotation->value.as_float[0]);
         }
         if (auto maxAnnotation =
-                std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "max"; });
+                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "max"; });
             maxAnnotation != uniformInfo.annotations.end())
         {
             max = maxAnnotation->type.is_integral() ? maxAnnotation->value.as_int[0] : static_cast<int>(maxAnnotation->value.as_float[0]);
@@ -284,7 +288,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     KeyUniform::KeyUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "key")
         {
             Logger::err("Tried to create a KeyUniform from a non key uniform_info");
@@ -304,7 +308,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     MouseButtonUniform::MouseButtonUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "mousebutton")
         {
             Logger::err("Tried to create a MouseButtonUniform from a non mousebutton uniform_info");
@@ -324,7 +328,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     MousePointUniform::MousePointUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "mousepoint")
         {
             Logger::err("Tried to create a MousePointUniform from a non mousepoint uniform_info");
@@ -344,7 +348,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     MouseDeltaUniform::MouseDeltaUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "mousedelta")
         {
             Logger::err("Tried to create a MouseDeltaUniform from a non mousedelta uniform_info");
@@ -364,7 +368,7 @@ namespace VulkanFX
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     DepthUniform::DepthUniform(reshadefx::uniform uniformInfo)
     {
-        auto source = std::find_if(uniformInfo.annotations.begin(), uniformInfo.annotations.end(), [](const auto& a) { return a.name == "source"; });
+        auto source = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "source"; });
         if (source->value.string_data != "bufready_depth")
         {
             Logger::err("Tried to create a DepthUniform from a non bufready_depth uniform_info");
