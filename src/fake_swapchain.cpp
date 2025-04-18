@@ -8,7 +8,7 @@ namespace VulkanFX
                                    LogicalDevice*                   pLogicalDevice,
                                    VkSwapchainCreateInfoKHR         swapchainCreateInfo,
                                    uint32_t                         count,
-                                   VkDeviceMemory&                  deviceMemory) -> std::vector<VkImage>
+                                   VmaAllocation&                   deviceMemory) -> std::vector<VkImage>
     {
         std::vector<VkImage> fakeImages(count);
 
@@ -46,37 +46,14 @@ namespace VulkanFX
         imageCreateInfo.initialLayout         = VK_IMAGE_LAYOUT_UNDEFINED;
 
         VkResult result;
-        for (uint32_t i = 0; i < count; i++)
-        {
-            result = pDispatch->CreateImage(pLogicalDevice->device, &imageCreateInfo, nullptr, &(fakeImages[i]));
-            ASSERT_VULKAN(result);
-        }
-
-        // Allocate a bunch of memory for all images at one
-        VkMemoryRequirements memoryRequirements;
-        pDispatch->GetImageMemoryRequirements(pLogicalDevice->device, fakeImages[0], &memoryRequirements);
-
-        Logger::debug("fake image size: " + std::to_string(memoryRequirements.size));
-        Logger::debug("fake image alignment: " + std::to_string(memoryRequirements.alignment));
-
-        if (memoryRequirements.size % memoryRequirements.alignment != 0)
-        {
-            memoryRequirements.size = (memoryRequirements.size / memoryRequirements.alignment + 1) * memoryRequirements.alignment;
-        }
-
-        VkMemoryAllocateInfo memoryAllocateInfo;
-        memoryAllocateInfo.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        memoryAllocateInfo.pNext          = nullptr;
-        memoryAllocateInfo.allocationSize = memoryRequirements.size * count;
-        memoryAllocateInfo.memoryTypeIndex =
-            findMemoryTypeIndex(pDispatch, pLogicalDevice, memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-        result = pDispatch->AllocateMemory(pLogicalDevice->device, &memoryAllocateInfo, nullptr, &deviceMemory);
-        ASSERT_VULKAN(result);
+        VmaAllocationCreateInfo memoryAllocateInfo = {};
+        memoryAllocateInfo.usage = VMA_MEMORY_USAGE_AUTO;
+        memoryAllocateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+        memoryAllocateInfo.preferredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
         for (uint32_t i = 0; i < count; i++)
         {
-            result = pDispatch->BindImageMemory(pLogicalDevice->device, fakeImages[i], deviceMemory, memoryRequirements.size * i);
+            result = vmaCreateImage(pLogicalDevice->allocator, &imageCreateInfo, &memoryAllocateInfo, &(fakeImages[i]), &deviceMemory, nullptr);
             ASSERT_VULKAN(result);
         }
         return fakeImages;

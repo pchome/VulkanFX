@@ -366,8 +366,8 @@ namespace VulkanFX
             pDispatch->DestroyImageView(pLogicalDevice->device, edgeImageViews[i], nullptr);
             pDispatch->DestroyImageView(pLogicalDevice->device, blendImageViews[i], nullptr);
             pDispatch->DestroyImageView(pLogicalDevice->device, outputImageViews[i], nullptr);
-            pDispatch->DestroyImage(pLogicalDevice->device, edgeImages[i], nullptr);
-            pDispatch->DestroyImage(pLogicalDevice->device, blendImages[i], nullptr);
+            vmaDestroyImage(pLogicalDevice->allocator, edgeImages[i], nullptr);
+            vmaDestroyImage(pLogicalDevice->allocator, blendImages[i], nullptr);
         }
         Logger::debug("after DestroyImageView");
         pDispatch->DestroyImageView(pLogicalDevice->device, areaImageView, nullptr);
