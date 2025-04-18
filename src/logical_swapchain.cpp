@@ -15,18 +15,20 @@ namespace VulkanFX
                 pLogicalDevice->device, pLogicalDevice->commandPool, commandBuffersNoEffect.size(), commandBuffersNoEffect.data());
             Logger::debug("after free commandbuffer");
 
-            pDispatch->FreeMemory(pLogicalDevice->device, fakeImageMemory, nullptr);
-
-            for (uint32_t i = 0; i < fakeImages.size(); i++)
+            for (auto& fakeImage : fakeImages)
             {
-                pDispatch->DestroyImage(pLogicalDevice->device, fakeImages[i], nullptr);
+                vmaDestroyImage(pLogicalDevice->allocator, fakeImage, nullptr);
             }
+            Logger::debug("after free fakeImages");
 
-            for (unsigned int i = 0; i < imageCount; i++)
+            for (auto& semaphore : semaphores)
             {
-                pDispatch->DestroySemaphore(pLogicalDevice->device, semaphores[i], nullptr);
+                pDispatch->DestroySemaphore(pLogicalDevice->device, semaphore, nullptr);
             }
             Logger::debug("after DestroySemaphore");
+
+            vmaFreeMemory(pLogicalDevice->allocator, fakeImageMemory);
+            Logger::debug("after free fakeImagesMemory");
         }
     }
 } // namespace VulkanFX

@@ -10,7 +10,7 @@ namespace VulkanFX
                                    LogicalDevice*                   pLogicalDevice,
                                    VkSwapchainCreateInfoKHR         swapchainCreateInfo,
                                    uint32_t                         count,
-                                   VkDeviceMemory&                  deviceMemory) -> std::vector<VkImage>;
+                                   VmaAllocation&                   deviceMemory) -> std::vector<VkImage>;
 }
 
 #endif // FAKE_SWAPCHAIN_HPP_INCLUDED

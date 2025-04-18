@@ -1130,16 +1130,16 @@ namespace VulkanFX
         {
             for (auto image : it.second)
             {
-                pDispatch->DestroyImage(pLogicalDevice->device, image, nullptr);
+                vmaDestroyImage(pLogicalDevice->allocator, image, nullptr);
             }
         }
 
         for (auto& image : backBufferImages)
         {
-            pDispatch->DestroyImage(pLogicalDevice->device, image, nullptr);
+            vmaDestroyImage(pLogicalDevice->allocator, image, nullptr);
         }
 
-        pDispatch->DestroyImage(pLogicalDevice->device, stencilImage, nullptr);
+        vmaDestroyImage(pLogicalDevice->allocator, stencilImage, nullptr);
 
         for (auto& sampler : samplers)
         {
