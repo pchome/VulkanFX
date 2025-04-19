@@ -16,7 +16,7 @@ namespace VulkanFX
     class ReShadeUniform
     {
     public:
-        void virtual update(void* mapedBuffer) = 0;
+        void virtual update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) = 0;
         virtual ~ReShadeUniform(){};
 
     protected:
@@ -30,18 +30,18 @@ namespace VulkanFX
     {
     public:
         FrameTimeUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~FrameTimeUniform();
 
     private:
-        std::chrono::time_point<std::chrono::high_resolution_clock> lastFrame;
+        std::chrono::time_point<std::chrono::steady_clock> lastFrame;
     };
 
     class FrameCountUniform : public ReShadeUniform
     {
     public:
         FrameCountUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~FrameCountUniform();
 
     private:
@@ -52,7 +52,7 @@ namespace VulkanFX
     {
     public:
         DateUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~DateUniform();
     };
 
@@ -60,22 +60,22 @@ namespace VulkanFX
     {
     public:
         TimerUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~TimerUniform();
 
     private:
-        std::chrono::time_point<std::chrono::high_resolution_clock> start;
+        std::chrono::time_point<std::chrono::steady_clock> start;
     };
 
     class PingPongUniform : public ReShadeUniform
     {
     public:
         PingPongUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~PingPongUniform();
 
     private:
-        std::chrono::time_point<std::chrono::high_resolution_clock> lastFrame;
+        std::chrono::time_point<std::chrono::steady_clock> lastFrame;
 
         float min             = 0.0f;
         float max             = 0.0f;
@@ -89,7 +89,7 @@ namespace VulkanFX
     {
     public:
         RandomUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~RandomUniform();
 
     private:
@@ -101,7 +101,7 @@ namespace VulkanFX
     {
     public:
         KeyUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~KeyUniform();
     };
 
@@ -109,7 +109,7 @@ namespace VulkanFX
     {
     public:
         MouseButtonUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~MouseButtonUniform();
     };
 
@@ -117,7 +117,7 @@ namespace VulkanFX
     {
     public:
         MousePointUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~MousePointUniform();
     };
 
@@ -125,7 +125,7 @@ namespace VulkanFX
     {
     public:
         MouseDeltaUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~MouseDeltaUniform();
     };
 
@@ -133,7 +133,7 @@ namespace VulkanFX
     {
     public:
         DepthUniform(reshadefx::uniform uniformInfo);
-        void virtual update(void* mapedBuffer) override;
+        void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
         virtual ~DepthUniform();
     };
 } // namespace VulkanFX

@@ -1,6 +1,7 @@
 #include "reshade_uniforms.hpp"
 
 #include <algorithm>
+#include <chrono>
 #include <cstring>
 #include <ctime>
 #include <cstdlib>
@@ -92,17 +93,17 @@ namespace VulkanFX
         {
             Logger::err("Tried to create a FrameTimeUniform from a non frametime uniform_info");
         }
-        lastFrame = std::chrono::high_resolution_clock::now();
+        lastFrame = std::chrono::steady_clock::now();
         offset    = uniformInfo.offset;
         size      = uniformInfo.size;
     }
-    void FrameTimeUniform::update(void* mapedBuffer)
+    void FrameTimeUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
-        auto                                     currentFrame = std::chrono::high_resolution_clock::now();
+        auto                                     currentFrame = std::chrono::steady_clock::now();
         std::chrono::duration<float, std::milli> duration     = currentFrame - lastFrame;
         lastFrame                                             = currentFrame;
         float frametime                                       = duration.count();
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(frametime), sizeof(float));
+        vmaCopyMemoryToAllocation(allocator, &(frametime), stagingBufferMemory, offset, sizeof(float));
     }
     FrameTimeUniform::~FrameTimeUniform()
     {
@@ -119,9 +120,9 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void FrameCountUniform::update(void* mapedBuffer)
+    void FrameCountUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(count), sizeof(int32_t));
+        vmaCopyMemoryToAllocation(allocator, &(count), stagingBufferMemory, offset, sizeof(int32_t));
         count++;
     }
     FrameCountUniform::~FrameCountUniform()
@@ -139,7 +140,7 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void DateUniform::update(void* mapedBuffer)
+    void DateUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         auto        now         = std::chrono::system_clock::now();
         std::time_t nowC        = std::chrono::system_clock::to_time_t(now);
@@ -149,7 +150,7 @@ namespace VulkanFX
         float       day         = static_cast<float>(currentTime->tm_mday);
         float       seconds     = static_cast<float>((currentTime->tm_hour * 60 + currentTime->tm_min) * 60 + currentTime->tm_sec);
         float       date[]      = {year, month, day, seconds};
-        std::memcpy((uint8_t*) mapedBuffer + offset, date, sizeof(float) * 4);
+        vmaCopyMemoryToAllocation(allocator, date, stagingBufferMemory, offset, sizeof(float) * 4);
     }
     DateUniform::~DateUniform()
     {
@@ -163,16 +164,16 @@ namespace VulkanFX
         {
             Logger::err("Tried to create a TimerUniform from a non timer uniform_info");
         }
-        start  = std::chrono::high_resolution_clock::now();
+        start  = std::chrono::steady_clock::now();
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void TimerUniform::update(void* mapedBuffer)
+    void TimerUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
-        auto                                     currentFrame = std::chrono::high_resolution_clock::now();
+        auto                                     currentFrame = std::chrono::steady_clock::now();
         std::chrono::duration<float, std::milli> duration     = currentFrame - start;
         float                                    timer        = duration.count();
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(timer), sizeof(float));
+        vmaCopyMemoryToAllocation(allocator, &(timer), stagingBufferMemory, offset, sizeof(float));
     }
     TimerUniform::~TimerUniform()
     {
@@ -215,14 +216,14 @@ namespace VulkanFX
                 stepAnnotation->type.is_floating_point() ? stepAnnotation->value.as_float[1] : static_cast<float>(stepAnnotation->value.as_int[1]);
         }
 
-        lastFrame = std::chrono::high_resolution_clock::now();
+        lastFrame = std::chrono::steady_clock::now();
 
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void PingPongUniform::update(void* mapedBuffer)
+    void PingPongUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
-        auto currentFrame = std::chrono::high_resolution_clock::now();
+        auto currentFrame = std::chrono::steady_clock::now();
 
         std::chrono::duration<float, std::ratio<1>> frameTime = currentFrame - lastFrame;
 
@@ -247,7 +248,7 @@ namespace VulkanFX
                 currentValue[0] = min, currentValue[1] = 1.0f;
             }
         }
-        std::memcpy((uint8_t*) mapedBuffer + offset, currentValue, sizeof(float) * 2);
+        vmaCopyMemoryToAllocation(allocator, currentValue, stagingBufferMemory, offset, sizeof(float) * 2);
     }
     PingPongUniform::~PingPongUniform()
     {
@@ -276,10 +277,10 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void RandomUniform::update(void* mapedBuffer)
+    void RandomUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         int32_t value = min + (std::rand() % (max - min + 1));
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(value), sizeof(int32_t));
+        vmaCopyMemoryToAllocation(allocator, &(value), stagingBufferMemory, offset, sizeof(int32_t));
     }
     RandomUniform::~RandomUniform()
     {
@@ -296,10 +297,10 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void KeyUniform::update(void* mapedBuffer)
+    void KeyUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         VkBool32 keyDown = VK_FALSE; // TODO
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(keyDown), sizeof(VkBool32));
+        vmaCopyMemoryToAllocation(allocator, &(keyDown), stagingBufferMemory, offset, sizeof(VkBool32));
     }
     KeyUniform::~KeyUniform()
     {
@@ -316,10 +317,10 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void MouseButtonUniform::update(void* mapedBuffer)
+    void MouseButtonUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         VkBool32 keyDown = VK_FALSE; // TODO
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(keyDown), sizeof(VkBool32));
+        vmaCopyMemoryToAllocation(allocator, &(keyDown), stagingBufferMemory, offset, sizeof(VkBool32));
     }
     MouseButtonUniform::~MouseButtonUniform()
     {
@@ -336,10 +337,10 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void MousePointUniform::update(void* mapedBuffer)
+    void MousePointUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         float point[2] = {0.0f, 0.0f}; // TODO
-        std::memcpy((uint8_t*) mapedBuffer + offset, point, sizeof(float) * 2);
+        vmaCopyMemoryToAllocation(allocator, point, stagingBufferMemory, offset, sizeof(float) * 2);
     }
     MousePointUniform::~MousePointUniform()
     {
@@ -356,10 +357,10 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void MouseDeltaUniform::update(void* mapedBuffer)
+    void MouseDeltaUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         float delta[2] = {0.0f, 0.0f}; // TODO
-        std::memcpy((uint8_t*) mapedBuffer + offset, delta, sizeof(float) * 2);
+        vmaCopyMemoryToAllocation(allocator, delta, stagingBufferMemory, offset, sizeof(float) * 2);
     }
     MouseDeltaUniform::~MouseDeltaUniform()
     {
@@ -376,10 +377,10 @@ namespace VulkanFX
         offset = uniformInfo.offset;
         size   = uniformInfo.size;
     }
-    void DepthUniform::update(void* mapedBuffer)
+    void DepthUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
         VkBool32 hasDepth = VK_FALSE; // TODO
-        std::memcpy((uint8_t*) mapedBuffer + offset, &(hasDepth), sizeof(VkBool32));
+        vmaCopyMemoryToAllocation(allocator, &(hasDepth), stagingBufferMemory, offset, sizeof(VkBool32));
     }
     DepthUniform::~DepthUniform()
     {
