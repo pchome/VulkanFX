@@ -16,6 +16,7 @@ So far:
 - unbundeled `ReShade FX`, bumped to most recent version, use system package
 - migrated to `vkroots`, use system package
 - split in 3 parts, removed `depthCapture` option from config, config initialized only once
+- `VULKANFX_CONFIG` environment variable
 
 
 ## Disclaimer
@@ -32,8 +33,40 @@ Before building, you will need:
 - dev-util/vulkan-headers
 - dev-libs/stb
 - media-libs/vkroots
-- \>=dev-util/reshade-fx-6.4.1
-- (optional) dev-util/reshade-fxc
+- dev-util/vma ([Vulkan Memory Allocator](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator))
+- \>=dev-util/reshade-fx-6.4.1 ([Parser/Codegen for the ReShade FX shader language](https://github.com/crosire/reshade/tree/main/source))
+- (optional) dev-util/reshade-fxc ([ReShade FX shader compiler](https://github.com/crosire/reshade/tree/main/tools))<br>
+  In my gentoo overlay it also contain patch to generate config from ReShade FX shader.<br>
+  <details>
+    <summary>e.g. `$ reshade-fx2conf Daltonize.fx`</summary>
+
+    ```
+    # Daltonize.fx
+
+    # type: combo
+    # items: Protanopia
+    #        Deuteranopia
+    #        Tritanopia
+    #        
+    #Type = 0
+
+    # Directives
+    #RESHADE_DEPTH_INPUT_X_OFFSET=0
+    #RESHADE_DEPTH_INPUT_Y_PIXEL_OFFSET=0
+    #RESHADE_DEPTH_INPUT_X_PIXEL_OFFSET=0
+    #RESHADE_DEPTH_INPUT_Y_OFFSET=0
+    #RESHADE_DEPTH_INPUT_Y_SCALE=1
+    #RESHADE_DEPTH_INPUT_X_SCALE=1
+    #RESHADE_DEPTH_LINEARIZATION_FAR_PLANE=1000.0
+    #RESHADE_DEPTH_INPUT_IS_LOGARITHMIC=0
+    #RESHADE_DEPTH_INPUT_IS_MIRRORED=0
+    #RESHADE_DEPTH_INPUT_IS_REVERSED=1
+    #RESHADE_DEPTH_MULTIPLIER=1
+    #RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN=0
+    ```
+  
+  </details>
+
 
 ### Building
 
