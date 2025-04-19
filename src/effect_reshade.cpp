@@ -809,16 +809,10 @@ namespace VulkanFX
     {
         if (bufferSize)
         {
-            // TODO: convert to vmaCopyMemoryToAllocation()
-            void*    data;
-            VkResult result = vmaMapMemory(pLogicalDevice->allocator, stagingBufferMemory, &data);
-            ASSERT_VULKAN(result);
             for (auto& uniform : uniforms)
             {
-                uniform->update(data);
+                uniform->update(pLogicalDevice->allocator, stagingBufferMemory);
             }
-            vmaUnmapMemory(pLogicalDevice->allocator, stagingBufferMemory);
-            vmaFlushAllocation(pLogicalDevice->allocator, stagingBufferMemory, 0, VK_WHOLE_SIZE);
         }
     }
 
