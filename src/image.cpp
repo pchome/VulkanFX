@@ -54,7 +54,6 @@ namespace VulkanFX
         VkResult result;
         VmaAllocationCreateInfo memoryAllocateInfo = {};
         memoryAllocateInfo.usage = VMA_MEMORY_USAGE_AUTO;
-        // memoryAllocateInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
         memoryAllocateInfo.preferredFlags = properties;
 
         for (uint32_t i = 0; i < count; i++)
