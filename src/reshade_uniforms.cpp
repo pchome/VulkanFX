@@ -17,8 +17,8 @@ namespace VulkanFX
     {
         for (auto& uniform : module.uniforms)
         {
-            auto src_annotation = std::ranges::find_if(uniform.annotations, [](const auto& a) { return a.name == "source"; });
-            std::string source = src_annotation != uniform.annotations.end() ? src_annotation->value.string_data : "(empty)";
+            auto        src_annotation = std::ranges::find_if(uniform.annotations, [](const auto& a) { return a.name == "source"; });
+            std::string source         = src_annotation != uniform.annotations.end() ? src_annotation->value.string_data : "(empty)";
             Logger::debug("uniform: '" + source + "'"); // TODO: can be empty or unknown
             Logger::debug("name:     " + uniform.name);
             Logger::debug("size:     " + std::to_string(uniform.size));
@@ -105,9 +105,7 @@ namespace VulkanFX
         float frametime                                       = duration.count();
         vmaCopyMemoryToAllocation(allocator, &(frametime), stagingBufferMemory, offset, sizeof(float));
     }
-    FrameTimeUniform::~FrameTimeUniform()
-    {
-    }
+    FrameTimeUniform::~FrameTimeUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     FrameCountUniform::FrameCountUniform(reshadefx::uniform uniformInfo)
@@ -125,9 +123,7 @@ namespace VulkanFX
         vmaCopyMemoryToAllocation(allocator, &(count), stagingBufferMemory, offset, sizeof(int32_t));
         count++;
     }
-    FrameCountUniform::~FrameCountUniform()
-    {
-    }
+    FrameCountUniform::~FrameCountUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     DateUniform::DateUniform(reshadefx::uniform uniformInfo)
@@ -142,19 +138,19 @@ namespace VulkanFX
     }
     void DateUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
+
         auto        now         = std::chrono::system_clock::now();
         std::time_t nowC        = std::chrono::system_clock::to_time_t(now);
         struct tm*  currentTime = std::localtime(&nowC);
-        float       year        = 1900.0f + static_cast<float>(currentTime->tm_year);
-        float       month       = 1.0f + static_cast<float>(currentTime->tm_mon);
-        float       day         = static_cast<float>(currentTime->tm_mday);
-        float       seconds     = static_cast<float>((currentTime->tm_hour * 60 + currentTime->tm_min) * 60 + currentTime->tm_sec);
-        float       date[]      = {year, month, day, seconds};
-        vmaCopyMemoryToAllocation(allocator, date, stagingBufferMemory, offset, sizeof(float) * 4);
+        auto        year        = static_cast<float>(currentTime->tm_year + start_year);
+        auto        month       = static_cast<float>(currentTime->tm_mon + 1);
+        auto        day         = static_cast<float>(currentTime->tm_mday);
+        auto        seconds     = static_cast<float>((currentTime->tm_hour * min_in_hr + currentTime->tm_min) * min_in_hr + currentTime->tm_sec);
+
+        date = {year, month, day, seconds};
+        vmaCopyMemoryToAllocation(allocator, date.data(), stagingBufferMemory, offset, sizeof(float) * 4);
     }
-    DateUniform::~DateUniform()
-    {
-    }
+    DateUniform::~DateUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     TimerUniform::TimerUniform(reshadefx::uniform uniformInfo)
@@ -175,9 +171,7 @@ namespace VulkanFX
         float                                    timer        = duration.count();
         vmaCopyMemoryToAllocation(allocator, &(timer), stagingBufferMemory, offset, sizeof(float));
     }
-    TimerUniform::~TimerUniform()
-    {
-    }
+    TimerUniform::~TimerUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     PingPongUniform::PingPongUniform(reshadefx::uniform uniformInfo)
@@ -187,27 +181,23 @@ namespace VulkanFX
         {
             Logger::err("Tried to create a PingPongUniform from a non pingpong uniform_info");
         }
-        if (auto minAnnotation =
-                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "min"; });
+        if (auto minAnnotation = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "min"; });
             minAnnotation != uniformInfo.annotations.end())
         {
             min = minAnnotation->type.is_floating_point() ? minAnnotation->value.as_float[0] : static_cast<float>(minAnnotation->value.as_int[0]);
         }
-        if (auto maxAnnotation =
-                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "max"; });
+        if (auto maxAnnotation = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "max"; });
             maxAnnotation != uniformInfo.annotations.end())
         {
             max = maxAnnotation->type.is_floating_point() ? maxAnnotation->value.as_float[0] : static_cast<float>(maxAnnotation->value.as_int[0]);
         }
-        if (auto smoothingAnnotation =
-                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "smoothing"; });
+        if (auto smoothingAnnotation = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "smoothing"; });
             smoothingAnnotation != uniformInfo.annotations.end())
         {
             smoothing = smoothingAnnotation->type.is_floating_point() ? smoothingAnnotation->value.as_float[0]
                                                                       : static_cast<float>(smoothingAnnotation->value.as_int[0]);
         }
-        if (auto stepAnnotation =
-                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "step"; });
+        if (auto stepAnnotation = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "step"; });
             stepAnnotation != uniformInfo.annotations.end())
         {
             stepMin =
@@ -228,31 +218,33 @@ namespace VulkanFX
         std::chrono::duration<float, std::ratio<1>> frameTime = currentFrame - lastFrame;
 
         float increment = stepMax == 0 ? stepMin : (stepMin + std::fmod(static_cast<float>(std::rand()), stepMax - stepMin + 1.0f));
-        if (currentValue[1] >= 0)
+        if (currentValue.at(1) >= 0)
         {
-            increment = std::max(increment - std::max(0.0f, smoothing - (max - currentValue[0])), 0.05f);
+            increment = std::max(increment - std::max(0.0f, smoothing - (max - currentValue.at(0))), step);
             increment *= frameTime.count();
 
-            if ((currentValue[0] += increment) >= max)
+            currentValue.at(0) += increment;
+
+            if (currentValue.at(0) >= max)
             {
-                currentValue[0] = max, currentValue[1] = -1.0f;
+                currentValue.at(0) = max, currentValue.at(1) = -1.0f;
             }
         }
         else
         {
-            increment = std::max(increment - std::max(0.0f, smoothing - (currentValue[0] - min)), 0.05f);
+            increment = std::max(increment - std::max(0.0f, smoothing - (currentValue[0] - min)), step);
             increment *= frameTime.count();
 
-            if ((currentValue[0] -= increment) <= min)
+            currentValue.at(0) -= increment;
+
+            if (currentValue.at(0) <= min)
             {
                 currentValue[0] = min, currentValue[1] = 1.0f;
             }
         }
-        vmaCopyMemoryToAllocation(allocator, currentValue, stagingBufferMemory, offset, sizeof(float) * 2);
+        vmaCopyMemoryToAllocation(allocator, currentValue.data(), stagingBufferMemory, offset, sizeof(float) * 2);
     }
-    PingPongUniform::~PingPongUniform()
-    {
-    }
+    PingPongUniform::~PingPongUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     RandomUniform::RandomUniform(reshadefx::uniform uniformInfo)
@@ -262,14 +254,12 @@ namespace VulkanFX
         {
             Logger::err("Tried to create a RandomUniform from a non random uniform_info");
         }
-        if (auto minAnnotation =
-                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "min"; });
+        if (auto minAnnotation = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "min"; });
             minAnnotation != uniformInfo.annotations.end())
         {
             min = minAnnotation->type.is_integral() ? minAnnotation->value.as_int[0] : static_cast<int>(minAnnotation->value.as_float[0]);
         }
-        if (auto maxAnnotation =
-                std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "max"; });
+        if (auto maxAnnotation = std::ranges::find_if(uniformInfo.annotations, [](const auto& a) { return a.name == "max"; });
             maxAnnotation != uniformInfo.annotations.end())
         {
             max = maxAnnotation->type.is_integral() ? maxAnnotation->value.as_int[0] : static_cast<int>(maxAnnotation->value.as_float[0]);
@@ -282,9 +272,7 @@ namespace VulkanFX
         int32_t value = min + (std::rand() % (max - min + 1));
         vmaCopyMemoryToAllocation(allocator, &(value), stagingBufferMemory, offset, sizeof(int32_t));
     }
-    RandomUniform::~RandomUniform()
-    {
-    }
+    RandomUniform::~RandomUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     KeyUniform::KeyUniform(reshadefx::uniform uniformInfo)
@@ -302,9 +290,7 @@ namespace VulkanFX
         VkBool32 keyDown = VK_FALSE; // TODO
         vmaCopyMemoryToAllocation(allocator, &(keyDown), stagingBufferMemory, offset, sizeof(VkBool32));
     }
-    KeyUniform::~KeyUniform()
-    {
-    }
+    KeyUniform::~KeyUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     MouseButtonUniform::MouseButtonUniform(reshadefx::uniform uniformInfo)
@@ -322,9 +308,7 @@ namespace VulkanFX
         VkBool32 keyDown = VK_FALSE; // TODO
         vmaCopyMemoryToAllocation(allocator, &(keyDown), stagingBufferMemory, offset, sizeof(VkBool32));
     }
-    MouseButtonUniform::~MouseButtonUniform()
-    {
-    }
+    MouseButtonUniform::~MouseButtonUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     MousePointUniform::MousePointUniform(reshadefx::uniform uniformInfo)
@@ -339,12 +323,10 @@ namespace VulkanFX
     }
     void MousePointUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
-        float point[2] = {0.0f, 0.0f}; // TODO
-        vmaCopyMemoryToAllocation(allocator, point, stagingBufferMemory, offset, sizeof(float) * 2);
+        std::array<float, 2> point = {0.0f, 0.0f}; // TODO
+        vmaCopyMemoryToAllocation(allocator, point.data(), stagingBufferMemory, offset, sizeof(float) * 2);
     }
-    MousePointUniform::~MousePointUniform()
-    {
-    }
+    MousePointUniform::~MousePointUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     MouseDeltaUniform::MouseDeltaUniform(reshadefx::uniform uniformInfo)
@@ -359,12 +341,10 @@ namespace VulkanFX
     }
     void MouseDeltaUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
-        float delta[2] = {0.0f, 0.0f}; // TODO
-        vmaCopyMemoryToAllocation(allocator, delta, stagingBufferMemory, offset, sizeof(float) * 2);
+        std::array<float, 2> delta = {0.0f, 0.0f}; // TODO
+        vmaCopyMemoryToAllocation(allocator, delta.data(), stagingBufferMemory, offset, sizeof(float) * 2);
     }
-    MouseDeltaUniform::~MouseDeltaUniform()
-    {
-    }
+    MouseDeltaUniform::~MouseDeltaUniform() = default;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     DepthUniform::DepthUniform(reshadefx::uniform uniformInfo)
@@ -379,10 +359,12 @@ namespace VulkanFX
     }
     void DepthUniform::update(VmaAllocator allocator, VmaAllocation stagingBufferMemory)
     {
+#if !defined(DISABLE_DEPTH_CAPTURE) || DISABLE_DEPTH_CAPTURE == 0
+        VkBool32 hasDepth = VK_TRUE; // TODO
+#else
         VkBool32 hasDepth = VK_FALSE; // TODO
+#endif
         vmaCopyMemoryToAllocation(allocator, &(hasDepth), stagingBufferMemory, offset, sizeof(VkBool32));
     }
-    DepthUniform::~DepthUniform()
-    {
-    }
+    DepthUniform::~DepthUniform() = default;
 } // namespace VulkanFX

@@ -17,7 +17,7 @@ namespace VulkanFX
     {
     public:
         void virtual update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) = 0;
-        virtual ~ReShadeUniform(){};
+        virtual ~ReShadeUniform()                                                      = default;
 
     protected:
         uint32_t offset;
@@ -31,7 +31,7 @@ namespace VulkanFX
     public:
         FrameTimeUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~FrameTimeUniform();
+        ~FrameTimeUniform() override;
 
     private:
         std::chrono::time_point<std::chrono::steady_clock> lastFrame;
@@ -42,7 +42,7 @@ namespace VulkanFX
     public:
         FrameCountUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~FrameCountUniform();
+        ~FrameCountUniform() override;
 
     private:
         int32_t count = 0;
@@ -53,7 +53,13 @@ namespace VulkanFX
     public:
         DateUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~DateUniform();
+        ~DateUniform() override;
+
+    private:
+        static constexpr int start_year = 1900;
+        static constexpr int min_in_hr  = 60;
+
+        std::array<float, 4> date = {start_year, 1, 1, 0};
     };
 
     class TimerUniform : public ReShadeUniform
@@ -61,7 +67,7 @@ namespace VulkanFX
     public:
         TimerUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~TimerUniform();
+        ~TimerUniform() override;
 
     private:
         std::chrono::time_point<std::chrono::steady_clock> start;
@@ -72,17 +78,20 @@ namespace VulkanFX
     public:
         PingPongUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~PingPongUniform();
+        ~PingPongUniform() override;
 
     private:
+        static constexpr float step = 0.05f;
+
         std::chrono::time_point<std::chrono::steady_clock> lastFrame;
 
-        float min             = 0.0f;
-        float max             = 0.0f;
-        float stepMin         = 0.0f;
-        float stepMax         = 0.0f;
-        float smoothing       = 0.0f;
-        float currentValue[2] = {0.0f, 1.0f};
+        float min       = 0.0f;
+        float max       = 0.0f;
+        float stepMin   = 0.0f;
+        float stepMax   = 0.0f;
+        float smoothing = 0.0f;
+
+        std::array<float, 2> currentValue = {0.0f, 1.0f};
     };
 
     class RandomUniform : public ReShadeUniform
@@ -90,7 +99,7 @@ namespace VulkanFX
     public:
         RandomUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~RandomUniform();
+        ~RandomUniform() override;
 
     private:
         int max = 0;
@@ -102,7 +111,7 @@ namespace VulkanFX
     public:
         KeyUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~KeyUniform();
+        ~KeyUniform() override;
     };
 
     class MouseButtonUniform : public ReShadeUniform
@@ -110,7 +119,7 @@ namespace VulkanFX
     public:
         MouseButtonUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~MouseButtonUniform();
+        ~MouseButtonUniform() override;
     };
 
     class MousePointUniform : public ReShadeUniform
@@ -118,7 +127,7 @@ namespace VulkanFX
     public:
         MousePointUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~MousePointUniform();
+        ~MousePointUniform() override;
     };
 
     class MouseDeltaUniform : public ReShadeUniform
@@ -126,7 +135,7 @@ namespace VulkanFX
     public:
         MouseDeltaUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~MouseDeltaUniform();
+        ~MouseDeltaUniform() override;
     };
 
     class DepthUniform : public ReShadeUniform
@@ -134,7 +143,7 @@ namespace VulkanFX
     public:
         DepthUniform(reshadefx::uniform uniformInfo);
         void update(VmaAllocator allocator, VmaAllocation stagingBufferMemory) override;
-        virtual ~DepthUniform();
+        ~DepthUniform() override;
     };
 } // namespace VulkanFX
 
