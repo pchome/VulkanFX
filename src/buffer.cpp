@@ -24,6 +24,7 @@ namespace VulkanFX
 
 
         VkResult result = vmaCreateBuffer(pLogicalDevice->allocator, &bufferInfo, &allocInfo, &buffer, &bufferMemory, nullptr);
+        vmaSetAllocationName(pLogicalDevice->allocator, bufferMemory, std::string("vma: Buffer Memory: Buffer").c_str());
         ASSERT_VULKAN(result);
     }
 

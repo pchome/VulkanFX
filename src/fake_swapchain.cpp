@@ -52,6 +52,7 @@ namespace VulkanFX
         for (uint32_t i = 0; i < count; i++)
         {
             result = vmaCreateImage(pLogicalDevice->allocator, &imageCreateInfo, &memoryAllocateInfo, &(fakeImages[i]), &deviceMemory, nullptr);
+            vmaSetAllocationName(pLogicalDevice->allocator, deviceMemory, std::string("vma: Device Memory: Fake Swapchain Image[n]").c_str());
             ASSERT_VULKAN(result);
         }
         return fakeImages;

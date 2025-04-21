@@ -17,7 +17,11 @@ namespace VulkanFX
 
             for (auto& fakeImage : fakeImages)
             {
+                // TODO: this sometimes gives assertion in vma memory leak detector
                 vmaDestroyImage(pLogicalDevice->allocator, fakeImage, nullptr);
+                //       and this sometimes gives assertion in wine vkDestroySwapchainKHR dlls/winevulkan/loader_thunks.c, line 4074
+                //       whille fixes vma memory leak in other cases
+                // vmaDestroyImage(pLogicalDevice->allocator, fakeImage, fakeImageMemory);
             }
             Logger::debug("after free fakeImages");
 

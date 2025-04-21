@@ -51,14 +51,15 @@ namespace VulkanFX
         imageCreateInfo.pQueueFamilyIndices   = nullptr; // Don't care
         imageCreateInfo.initialLayout         = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        VkResult result;
+        VkResult                result;
         VmaAllocationCreateInfo memoryAllocateInfo = {};
-        memoryAllocateInfo.usage = VMA_MEMORY_USAGE_AUTO;
-        memoryAllocateInfo.preferredFlags = properties;
+        memoryAllocateInfo.usage                   = VMA_MEMORY_USAGE_AUTO;
+        memoryAllocateInfo.preferredFlags          = properties;
 
         for (uint32_t i = 0; i < count; i++)
         {
             result = vmaCreateImage(pLogicalDevice->allocator, &imageCreateInfo, &memoryAllocateInfo, &(images[i]), &imageMemory, nullptr);
+            vmaSetAllocationName(pLogicalDevice->allocator, imageMemory, std::string("vma: Image Memory: Image[n]").c_str());
             ASSERT_VULKAN(result);
         }
         return images;
@@ -73,7 +74,7 @@ namespace VulkanFX
                        uint32_t                         mipLevels)
     {
 
-        VkBuffer       stagingBuffer;
+        VkBuffer      stagingBuffer;
         VmaAllocation stagingMemory;
 
         createBuffer(pDispatch,
@@ -83,11 +84,7 @@ namespace VulkanFX
                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                      stagingBuffer,
                      stagingMemory);
-        // void*    data = nullptr;
-        // VkResult result = vmaMapMemory(pLogicalDevice->allocator, stagingMemory, &data);
-        // ASSERT_VULKAN(result);
-        // std::memcpy(data, writeData, size);
-        // vmaUnmapMemory(pLogicalDevice->allocator, stagingMemory);
+
         vmaCopyMemoryToAllocation(pLogicalDevice->allocator, writeData, stagingMemory, 0, size);
 
         VkCommandBufferAllocateInfo allocInfo = {};
