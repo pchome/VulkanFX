@@ -1,6 +1,7 @@
 #include "fake_swapchain.hpp"
 #include "memory.hpp"
 #include "format.hpp"
+#include <format>
 
 namespace VulkanFX
 {
@@ -8,9 +9,10 @@ namespace VulkanFX
                                    LogicalDevice*                   pLogicalDevice,
                                    VkSwapchainCreateInfoKHR         swapchainCreateInfo,
                                    uint32_t                         count,
-                                   VmaAllocation&                   deviceMemory) -> std::vector<VkImage>
+                                   std::vector<VmaAllocation>&      deviceMemoryBlocks) -> std::vector<VkImage>
     {
         std::vector<VkImage> fakeImages(count);
+        deviceMemoryBlocks.resize(count);
 
         VkFormat srgbFormat =
             isSRGB(swapchainCreateInfo.imageFormat) ? swapchainCreateInfo.imageFormat : convertToSRGB(swapchainCreateInfo.imageFormat);
@@ -51,8 +53,9 @@ namespace VulkanFX
 
         for (uint32_t i = 0; i < count; i++)
         {
-            result = vmaCreateImage(pLogicalDevice->allocator, &imageCreateInfo, &memoryAllocateInfo, &(fakeImages[i]), &deviceMemory, nullptr);
-            vmaSetAllocationName(pLogicalDevice->allocator, deviceMemory, std::string("vma: Device Memory: Fake Swapchain Image[n]").c_str());
+            Logger::debug(std::format("creating fake swapchain image {}", i));
+            result = vmaCreateImage(pLogicalDevice->allocator, &imageCreateInfo, &memoryAllocateInfo, &(fakeImages[i]), &deviceMemoryBlocks[i], nullptr);
+            vmaSetAllocationName(pLogicalDevice->allocator, deviceMemoryBlocks[i], std::string(std::format("vma: Device Memory: Fake Swapchain Image[{}]", i)).c_str());
             ASSERT_VULKAN(result);
         }
         return fakeImages;

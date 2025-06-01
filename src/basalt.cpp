@@ -170,12 +170,12 @@ namespace VulkanFX
                 pDispatch->DestroyCommandPool(device, pLogicalDevice->commandPool, pAllocator);
             }
 
-            pDispatch->DestroyDevice(device, pAllocator);
-
             if (pLogicalDevice->allocator != nullptr)
             {
                 vmaDestroyAllocator(pLogicalDevice->allocator);
             }
+
+            pDispatch->DestroyDevice(device, pAllocator);
             deviceMap::remove(device);
         }
 
@@ -364,7 +364,7 @@ namespace VulkanFX
             uint32_t fakeImageCount = pLogicalSwapchain->imageCount * (effectStrings.size() + !pLogicalDevice->supportsMutableFormat);
 
             pLogicalSwapchain->fakeImages = createFakeSwapchainImages(
-                pDispatch, pLogicalDevice.get(), pLogicalSwapchain->swapchainCreateInfo, fakeImageCount, pLogicalSwapchain->fakeImageMemory);
+                pDispatch, pLogicalDevice.get(), pLogicalSwapchain->swapchainCreateInfo, fakeImageCount, pLogicalSwapchain->fakeImageMemoryBlocks);
             Logger::debug("created fake swapchain images");
 
             VkFormat unormFormat = convertToUNORM(pLogicalSwapchain->format);

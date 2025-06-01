@@ -10,6 +10,7 @@ const auto vma_debug = std::string(debug_lvl ? debug_lvl : "") == "debug";
 
 #ifndef VMA_DEBUG_LOG_FORMAT
 #define VMA_DEBUG_LOG_FORMAT(format, ...) if (vma_debug) do { \
+    printf("VulkanFX    vma: "); \
     printf((format), __VA_ARGS__); \
     printf("\n"); \
 } while(false)

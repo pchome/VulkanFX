@@ -1,4 +1,5 @@
 #include "logical_swapchain.hpp"
+#include <format>
 
 namespace VulkanFX
 {
@@ -15,13 +16,10 @@ namespace VulkanFX
                 pLogicalDevice->device, pLogicalDevice->commandPool, commandBuffersNoEffect.size(), commandBuffersNoEffect.data());
             Logger::debug("after free commandbuffer");
 
-            for (auto& fakeImage : fakeImages)
+            for (uint32_t i = 0; i < fakeImages.size(); i++)
             {
-                // TODO: this sometimes gives assertion in vma memory leak detector
-                vmaDestroyImage(pLogicalDevice->allocator, fakeImage, nullptr);
-                //       and this sometimes gives assertion in wine vkDestroySwapchainKHR dlls/winevulkan/loader_thunks.c, line 4074
-                //       whille fixes vma memory leak in other cases
-                // vmaDestroyImage(pLogicalDevice->allocator, fakeImage, fakeImageMemory);
+                Logger::debug(std::format("deleting fake image {}", i));
+                vmaDestroyImage(pLogicalDevice->allocator, fakeImages[i], fakeImageMemoryBlocks[i]);
             }
             Logger::debug("after free fakeImages");
 
@@ -31,8 +29,8 @@ namespace VulkanFX
             }
             Logger::debug("after DestroySemaphore");
 
-            vmaFreeMemory(pLogicalDevice->allocator, fakeImageMemory);
-            Logger::debug("after free fakeImagesMemory");
+            fakeImages.clear();
+            fakeImageMemoryBlocks.clear();
         }
     }
 } // namespace VulkanFX

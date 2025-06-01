@@ -23,7 +23,7 @@ namespace VulkanFX
         std::vector<VkSemaphore>             semaphores;
         std::vector<std::shared_ptr<Effect>> effects;
         std::shared_ptr<Effect>              defaultTransfer;
-        VmaAllocation                        fakeImageMemory;
+        std::vector<VmaAllocation>           fakeImageMemoryBlocks;
 
         void destroy(const vkroots::VkDeviceDispatch* pDispatch);
     };
