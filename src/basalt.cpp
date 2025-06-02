@@ -113,11 +113,8 @@ namespace VulkanFX
                 Logger::debug("activating mutable_format");
                 addUniqueCString(enabledExtensionNames, "VK_KHR_swapchain_mutable_format");
             }
-            // if (deviceProps.apiVersion < VK_API_VERSION_1_2 || instanceVersionMap[GetKey(physicalDevice)] < VK_API_VERSION_1_2)
-            if (deviceProps.apiVersion < VK_API_VERSION_1_2)
-            {
-                addUniqueCString(enabledExtensionNames, "VK_KHR_image_format_list");
-            }
+            addUniqueCString(enabledExtensionNames, "VK_KHR_image_format_list");
+
             modifiedCreateInfo.ppEnabledExtensionNames = enabledExtensionNames.data();
             modifiedCreateInfo.enabledExtensionCount   = enabledExtensionNames.size();
 
