@@ -3,8 +3,9 @@
 #define UTIL_HPP_INCLUDED
 
 #include <string>
-#include <sstream>
+// #include <sstream>
 #include <vector>
+#include <format>
 
 namespace VulkanFX
 {
@@ -27,11 +28,13 @@ namespace VulkanFX
     void outputInColor(std::string output, Color foreground = Color::defaultColor, Color background = Color::defaultColor);
 
     template<typename T>
-    auto convertToString(T object) -> std::string
+    auto to_s(T object) -> std::string
     {
-        std::stringstream ss;
-        ss << object;
-        return ss.str();
+        // std::stringstream ss;
+        // ss << object;
+        // return ss.str();
+        return std::format("{:#x}", reinterpret_cast<std::uintptr_t>(object));
+        // return static_cast<std::uintptr_t>(object);
     }
 } // namespace VulkanFX
 

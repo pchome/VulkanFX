@@ -1,3 +1,4 @@
+#include <format>
 #include <memory>
 #include <mutex>
 #include <vector>
@@ -287,7 +288,7 @@ namespace VulkanFX
                 vulkanFunctions.vkFreeMemory                   = pDispatch->FreeMemory;
 
                 VmaAllocatorCreateInfo allocatorCreateInfo = {};
-                allocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
+                allocatorCreateInfo.flags                  = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
                 // allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
                 allocatorCreateInfo.physicalDevice   = pLogicalDevice->physicalDevice;
                 allocatorCreateInfo.device           = pLogicalDevice->device;
@@ -430,15 +431,15 @@ namespace VulkanFX
 #if !defined(DISABLE_RESHADEFX) || DISABLE_RESHADEFX == 0
                     if (!pConfig->getOption<std::string>(effectStrings[i]).empty())
                     {
-                    pLogicalSwapchain->effects.push_back(std::shared_ptr<Effect>(new ReShadeEffect(pDispatch,
-                                                                                                   pLogicalDevice.get(),
-                                                                                                   pLogicalSwapchain->format,
-                                                                                                   pLogicalSwapchain->imageExtent,
-                                                                                                   firstImages,
-                                                                                                   secondImages,
-                                                                                                   pConfig.get(),
-                                                                                                   effectStrings[i])));
-                    Logger::debug("created ReShadeEffect");
+                        pLogicalSwapchain->effects.push_back(std::shared_ptr<Effect>(new ReShadeEffect(pDispatch,
+                                                                                                       pLogicalDevice.get(),
+                                                                                                       pLogicalSwapchain->format,
+                                                                                                       pLogicalSwapchain->imageExtent,
+                                                                                                       firstImages,
+                                                                                                       secondImages,
+                                                                                                       pConfig.get(),
+                                                                                                       effectStrings[i])));
+                        Logger::debug("created ReShadeEffect");
                     }
                     else
                     {
@@ -466,12 +467,12 @@ namespace VulkanFX
             VkImage     depthImage     = pLogicalDevice->depthImageViews.size() ? pLogicalDevice->depthImages[0] : VK_NULL_HANDLE;
             VkFormat    depthFormat    = pLogicalDevice->depthImageViews.size() ? pLogicalDevice->depthFormats[0] : VK_FORMAT_UNDEFINED;
 
-            Logger::debug("effect string count: " + std::to_string(effectStrings.size()));
-            Logger::debug("effect count: " + std::to_string(pLogicalSwapchain->effects.size()));
+            Logger::debug(std::format("effect string count: {}", effectStrings.size()));
+            Logger::debug(std::format("effect count: {}", pLogicalSwapchain->effects.size()));
 
             pLogicalSwapchain->commandBuffersEffect = allocateCommandBuffer(pDispatch, pLogicalDevice.get(), pLogicalSwapchain->imageCount);
-            Logger::debug("allocated ComandBuffers " + std::to_string(pLogicalSwapchain->commandBuffersEffect.size()) + " for swapchain "
-                          + convertToString(swapchain));
+            Logger::debug(std::format(
+                "allocated ComandBuffers {} for swapchain {}", pLogicalSwapchain->commandBuffersEffect.size(), to_s(swapchain)));
 
             writeCommandBuffers(pDispatch,
                                 pLogicalDevice.get(),
@@ -486,7 +487,7 @@ namespace VulkanFX
             Logger::debug("created semaphores");
             for (unsigned int i = 0; i < pLogicalSwapchain->imageCount; i++)
             {
-                Logger::debug(std::to_string(i) + " written commandbuffer " + convertToString(pLogicalSwapchain->commandBuffersEffect[i]));
+                Logger::debug(std::format("{} written commandbuffer {}", i, to_s(pLogicalSwapchain->commandBuffersEffect[i])));
             }
             Logger::trace("vkGetSwapchainImagesKHR");
 
@@ -511,7 +512,7 @@ namespace VulkanFX
 
             for (unsigned int i = 0; i < pLogicalSwapchain->imageCount; i++)
             {
-                Logger::debug(std::to_string(i) + " written commandbuffer " + convertToString(pLogicalSwapchain->commandBuffersNoEffect[i]));
+                Logger::debug(std::format("{} written commandbuffer ", i, to_s(pLogicalSwapchain->commandBuffersNoEffect[i])));
             }
 
             *pCount = std::min<uint32_t>(*pCount, pLogicalSwapchain->imageCount);
@@ -597,7 +598,7 @@ namespace VulkanFX
             scoped_lock l(globalLock);
 
             // we need to delete the infos of the oldswapchain
-            Logger::trace("vkDestroySwapchainKHR " + convertToString(swapchain));
+            Logger::trace(std::format("vkDestroySwapchainKHR {}", to_s(swapchain)));
             swapchainMap::get(swapchain)->destroy(pDispatch);
             swapchainMap::remove(swapchain);
 
@@ -614,13 +615,16 @@ namespace VulkanFX
             scoped_lock l(globalLock);
 
             auto pLogicalDevice = deviceMap::get(device);
-            if (isDepthFormat(pCreateInfo->format) && pCreateInfo->samples == VK_SAMPLE_COUNT_1_BIT
-                && ((pCreateInfo->usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) == VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT))
+
+            const auto is_depth_used = [](VkImageUsageFlags usage) {
+                return (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) == VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+            };
+
+            if (isDepthFormat(pCreateInfo->format) && pCreateInfo->samples == VK_SAMPLE_COUNT_1_BIT && is_depth_used(pCreateInfo->usage))
             {
-                Logger::debug("detected depth image with format: " + convertToString(pCreateInfo->format));
-                Logger::debug(std::to_string(pCreateInfo->extent.width) + "x" + std::to_string(pCreateInfo->extent.height));
-                Logger::debug(std::to_string((pCreateInfo->usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
-                                             == VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT));
+                Logger::debug(std::format("detected depth image with format: {:#x}", static_cast<int32_t>(pCreateInfo->format)));
+                Logger::debug(std::format("{}x{}", pCreateInfo->extent.width, pCreateInfo->extent.height));
+                Logger::debug(std::format("used: {}", is_depth_used(pCreateInfo->usage)));
 
                 VkImageCreateInfo modifiedCreateInfo = *pCreateInfo;
                 modifiedCreateInfo.usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -678,7 +682,7 @@ namespace VulkanFX
                             pLogicalSwapchain->commandBuffersEffect.clear();
                             pLogicalSwapchain->commandBuffersEffect =
                                 allocateCommandBuffer(pDispatch, pLogicalDevice.get(), pLogicalSwapchain->imageCount);
-                            Logger::debug("allocated CommandBuffers for swapchain " + convertToString(it.first));
+                            Logger::debug("allocated CommandBuffers for swapchain " + to_s(it.first));
 
                             writeCommandBuffers(pDispatch,
                                                 pLogicalDevice.get(),
@@ -734,7 +738,7 @@ namespace VulkanFX
                                 pLogicalSwapchain->commandBuffersEffect.clear();
                                 pLogicalSwapchain->commandBuffersEffect =
                                     allocateCommandBuffer(pDispatch, pLogicalDevice.get(), pLogicalSwapchain->imageCount);
-                                Logger::debug("allocated CommandBuffers for swapchain " + convertToString(it.first));
+                                Logger::debug("allocated CommandBuffers for swapchain " + to_s(it.first));
 
                                 writeCommandBuffers(pDispatch,
                                                     pLogicalDevice.get(),

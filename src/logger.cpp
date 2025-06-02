@@ -68,8 +68,7 @@ namespace VulkanFX
         {
             std::lock_guard<std::mutex> lock(m_mutex);
 
-            static std::array<const char*, 5> s_prefixes = {
-                {"VulkanFX trace: ", "VulkanFX debug: ", "VulkanFX info:  ", "VulkanFX warn:  ", "VulkanFX err:   "}};
+            static std::array<const char*, 5> s_prefixes = {{"trace", "debug", "info", "warn", "err"}};
 
             const char* prefix = s_prefixes.at(static_cast<uint32_t>(level));
 
@@ -78,7 +77,8 @@ namespace VulkanFX
 
             while (std::getline(stream, line, '\n'))
             {
-                *m_outStream << prefix << line << std::endl;
+                // *m_outStream << prefix << line << std::endl;
+                std::println(*m_outStream, "VulkanFX {:>6}: {}", prefix, line);
             }
         }
     }

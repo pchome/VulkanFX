@@ -215,7 +215,7 @@ namespace VulkanFX
     }
     void SmaaEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {
-        Logger::debug("applying smaa effect to cb " + convertToString(commandBuffer));
+        Logger::debug(std::format("applying smaa effect to cb {}", to_s(commandBuffer)));
         // Used to make the Image accessable by the shader
         VkImageMemoryBarrier memoryBarrier;
         memoryBarrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -339,7 +339,7 @@ namespace VulkanFX
     }
     SmaaEffect::~SmaaEffect()
     {
-        Logger::debug("destroying smaa effect " + convertToString(this));
+        Logger::debug("destroying smaa effect " + to_s(this));
         pDispatch->DestroyPipeline(pLogicalDevice->device, edgePipeline, nullptr);
         pDispatch->DestroyPipeline(pLogicalDevice->device, blendPipeline, nullptr);
         pDispatch->DestroyPipeline(pLogicalDevice->device, neighborPipeline, nullptr);

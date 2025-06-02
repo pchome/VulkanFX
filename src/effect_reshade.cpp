@@ -686,7 +686,7 @@ namespace VulkanFX
                 case reshadefx::primitive_topology::line_strip: topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP; break;
                 case reshadefx::primitive_topology::triangle_list: topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST; break;
                 case reshadefx::primitive_topology::triangle_strip: topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP; break;
-                default: Logger::err("unsupported primitiv type" + convertToString((uint8_t) pass.topology)); break;
+                default: Logger::err("unsupported primitiv type" + to_s((uint8_t) pass.topology)); break;
             }
             */
 
@@ -875,7 +875,7 @@ namespace VulkanFX
     }
     void ReShadeEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {
-        Logger::debug("applying ReShadeEffect to command buffer" + convertToString(commandBuffer));
+        Logger::debug("applying ReShadeEffect to command buffer" + to_s(commandBuffer));
         // Used to make the Image accessable by the shader
         VkImageMemoryBarrier memoryBarrier;
         memoryBarrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1034,7 +1034,7 @@ namespace VulkanFX
 
     ReShadeEffect::~ReShadeEffect()
     {
-        Logger::debug("destroying ReShadeEffect" + convertToString(this));
+        Logger::debug("destroying ReShadeEffect" + to_s(this));
         for (auto& pipeline : graphicsPipelines)
         {
             pDispatch->DestroyPipeline(pLogicalDevice->device, pipeline, nullptr);

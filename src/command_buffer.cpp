@@ -2,6 +2,7 @@
 
 #include "format.hpp"
 #include "util.hpp"
+#include <format>
 
 namespace VulkanFX
 {
@@ -84,10 +85,10 @@ namespace VulkanFX
                                               &memoryBarrier);
             }
 
-            for (uint32_t j = 0; j < effects.size(); j++)
+            for (auto & effect : effects)
             {
-                Logger::debug("before applying effect " + convertToString(effects[j]));
-                effects[j]->applyEffect(pDispatch, i, commandBuffers[i]);
+                Logger::debug(std::format("before applying effect {}", to_s(effect.get())));
+                effect->applyEffect(pDispatch, i, commandBuffers[i]);
             }
 
             memoryBarrier.oldLayout     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

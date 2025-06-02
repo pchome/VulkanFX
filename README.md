@@ -26,7 +26,7 @@ Expect it to have bugs. Use it at your own risk.
 
 ### Dependencies
 Before building, you will need:
-- GCC >= 9
+- GCC >= 14
 - x11-libs/libX11
 - dev-util/glslang
 - dev-util/spirv-headers
@@ -47,7 +47,7 @@ Before building, you will need:
     # items: Protanopia
     #        Deuteranopia
     #        Tritanopia
-    #        
+    #
     #Type = 0
 
     # Directives
@@ -64,7 +64,7 @@ Before building, you will need:
     #RESHADE_DEPTH_MULTIPLIER=1
     #RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN=0
     ```
-  
+
   </details>
 
 

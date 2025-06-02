@@ -84,7 +84,7 @@ namespace VulkanFX
     }
     void SimpleEffect::applyEffect(const vkroots::VkDeviceDispatch* pDispatch, uint32_t imageIndex, VkCommandBuffer commandBuffer)
     {
-        Logger::debug("applying SimpleEffect to cb " + convertToString(commandBuffer));
+        Logger::debug("applying SimpleEffect to cb " + to_s(commandBuffer));
         // Used to make the Image accessable by the shader
         VkImageMemoryBarrier memoryBarrier;
         memoryBarrier.sType               = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -167,7 +167,7 @@ namespace VulkanFX
     }
     SimpleEffect::~SimpleEffect()
     {
-        Logger::debug("destroying SimpleEffect " + convertToString(this));
+        Logger::debug("destroying SimpleEffect " + to_s(this));
         pDispatch->DestroyPipeline(pLogicalDevice->device, graphicsPipeline, nullptr);
         pDispatch->DestroyPipelineLayout(pLogicalDevice->device, pipelineLayout, nullptr);
         pDispatch->DestroyRenderPass(pLogicalDevice->device, renderPass, nullptr);
