@@ -40,7 +40,7 @@ namespace VulkanFX
             line = skipWhiteSpace(line);
             size = std::stoi(line);
 
-            colorCube = std::vector<unsigned char>(size * size * size * 4, 255);
+            colorCube = std::vector<unsigned char>(size * size * size * 4, cval_max);
             return;
         }
         if (line.find("DOMAIN_MIN") != std::string::npos)
@@ -55,7 +55,7 @@ namespace VulkanFX
             splitTripel(line, maxX, maxY, maxZ);
             return;
         }
-        if (line.find_first_of("0123456789") == 0)
+        if (line.find_first_of("-0123456789") == 0)
         {
             float         x, y, z;
             unsigned char outX, outY, outZ;
@@ -108,15 +108,13 @@ namespace VulkanFX
 
     void LutCube::clampTripel(float x, float y, float z, unsigned char& outX, unsigned char& outY, unsigned char& outZ)
     {
-        outX = (unsigned char) 255 * (x / (maxX - minX));
-        outY = (unsigned char) 255 * (y / (maxY - minY));
-        outZ = (unsigned char) 255 * (z / (maxZ - minZ));
+        outX = x < 0 ? cval_min : (x > 1 ? cval_max : static_cast<char8_t>(cval_max * (x / (maxX - minX))));
+        outY = y < 0 ? cval_min : (y > 1 ? cval_max : static_cast<char8_t>(cval_max * (y / (maxY - minY))));
+        outZ = z < 0 ? cval_min : (z > 1 ? cval_max : static_cast<char8_t>(cval_max * (z / (maxZ - minZ))));
     }
 
     void LutCube::writeColor(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b)
     {
-        static const int colorSize = 4; // 4 bytes per point in the cube, rgba
-
         int locationR = (((z * size) + y) * size + x) * colorSize;
 
         colorCube[locationR + 0] = r;

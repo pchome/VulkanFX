@@ -32,6 +32,10 @@ namespace VulkanFX
         LutCube();
 
     private:
+        static constexpr char8_t cval_min  = 0;
+        static constexpr char8_t cval_max  = 255;
+        static constexpr int     colorSize = 4; // 4 bytes per point in the cube, rgba
+
         float minX = 0.0f;
         float minY = 0.0f;
         float minZ = 0.0f;
