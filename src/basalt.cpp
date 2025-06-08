@@ -322,18 +322,23 @@ namespace VulkanFX
                 vulkanFunctions.vkGetPhysicalDeviceMemoryProperties =
                     pDispatch->pPhysicalDeviceDispatch->pInstanceDispatch->GetPhysicalDeviceMemoryProperties;
                 vulkanFunctions.vkGetPhysicalDeviceMemoryProperties2KHR = pDispatch->pPhysicalDeviceDispatch->GetPhysicalDeviceMemoryProperties2KHR;
+                // vulkanFunctions.vkGetPhysicalDeviceMemoryProperties2KHR = pDispatch->pPhysicalDeviceDispatch->GetPhysicalDeviceMemoryProperties2;
                 vulkanFunctions.vkGetPhysicalDeviceProperties = pDispatch->pPhysicalDeviceDispatch->pInstanceDispatch->GetPhysicalDeviceProperties;
 
                 vulkanFunctions.vkGetDeviceBufferMemoryRequirements = pDispatch->GetDeviceBufferMemoryRequirements;
                 vulkanFunctions.vkGetBufferMemoryRequirements       = pDispatch->GetBufferMemoryRequirements;
-                vulkanFunctions.vkGetBufferMemoryRequirements2KHR   = pDispatch->GetBufferMemoryRequirements2KHR;
+                // vulkanFunctions.vkGetBufferMemoryRequirements2KHR   = pDispatch->GetBufferMemoryRequirements2KHR;
+                vulkanFunctions.vkGetBufferMemoryRequirements2KHR   = pDispatch->GetBufferMemoryRequirements2;
                 vulkanFunctions.vkBindBufferMemory                  = pDispatch->BindBufferMemory;
-                vulkanFunctions.vkBindBufferMemory2KHR              = pDispatch->BindBufferMemory2KHR;
+                // vulkanFunctions.vkBindBufferMemory2KHR              = pDispatch->BindBufferMemory2KHR;
+                vulkanFunctions.vkBindBufferMemory2KHR              = pDispatch->BindBufferMemory2;
                 vulkanFunctions.vkGetDeviceImageMemoryRequirements  = pDispatch->GetDeviceImageMemoryRequirements;
                 vulkanFunctions.vkGetImageMemoryRequirements        = pDispatch->GetImageMemoryRequirements;
-                vulkanFunctions.vkGetImageMemoryRequirements2KHR    = pDispatch->GetImageMemoryRequirements2KHR;
+                // vulkanFunctions.vkGetImageMemoryRequirements2KHR    = pDispatch->GetImageMemoryRequirements2KHR;
+                vulkanFunctions.vkGetImageMemoryRequirements2KHR    = pDispatch->GetImageMemoryRequirements2;
                 vulkanFunctions.vkBindImageMemory                   = pDispatch->BindImageMemory;
-                vulkanFunctions.vkBindImageMemory2KHR               = pDispatch->BindImageMemory2KHR;
+                // vulkanFunctions.vkBindImageMemory2KHR               = pDispatch->BindImageMemory2KHR;
+                vulkanFunctions.vkBindImageMemory2KHR               = pDispatch->BindImageMemory2;
 
                 vulkanFunctions.vkAllocateMemory               = pDispatch->AllocateMemory;
                 vulkanFunctions.vkMapMemory                    = pDispatch->MapMemory;
@@ -349,11 +354,11 @@ namespace VulkanFX
 
                 VmaAllocatorCreateInfo allocatorCreateInfo = {};
                 allocatorCreateInfo.flags                  = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
-                // allocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_2;
-                allocatorCreateInfo.physicalDevice   = pLogicalDevice->physicalDevice;
-                allocatorCreateInfo.device           = pLogicalDevice->device;
-                allocatorCreateInfo.instance         = pLogicalDevice->instance;
-                allocatorCreateInfo.pVulkanFunctions = &vulkanFunctions;
+                allocatorCreateInfo.vulkanApiVersion       = VK_API_VERSION_1_2;
+                allocatorCreateInfo.physicalDevice         = pLogicalDevice->physicalDevice;
+                allocatorCreateInfo.device                 = pLogicalDevice->device;
+                allocatorCreateInfo.instance               = pLogicalDevice->instance;
+                allocatorCreateInfo.pVulkanFunctions       = &vulkanFunctions;
 
                 VmaAllocator allocator;
                 vmaCreateAllocator(&allocatorCreateInfo, &allocator);
