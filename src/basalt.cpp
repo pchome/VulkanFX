@@ -67,9 +67,70 @@ namespace VulkanFX
     VKROOTS_DEFINE_SYNCHRONIZED_MAP_TYPE_EXT(deviceMap, void*)
     VKROOTS_DEFINE_SYNCHRONIZED_MAP_TYPE_EXT(swapchainMap, VkSwapchainKHR)
 
+    static auto getModifiedAppInfo(const VkInstanceCreateInfo* pCreateInfo) -> VkApplicationInfo
+    {
+        VkApplicationInfo appInfo;
+        if (pCreateInfo->pApplicationInfo)
+        {
+            appInfo = *(pCreateInfo->pApplicationInfo);
+            if (appInfo.apiVersion < VK_API_VERSION_1_2)
+            {
+                appInfo.apiVersion = VK_API_VERSION_1_2;
+            }
+        }
+        else
+        {
+            appInfo.sType              = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+            appInfo.pNext              = nullptr;
+            appInfo.pApplicationName   = nullptr;
+            appInfo.applicationVersion = 0;
+            appInfo.pEngineName        = nullptr;
+            appInfo.engineVersion      = 0;
+            appInfo.apiVersion         = VK_API_VERSION_1_2;
+        }
+
+        return appInfo;
+    }
+
+    static void printAppInfo(const VkInstanceCreateInfo* pCreateInfo)
+    {
+        if (!pCreateInfo->pApplicationInfo)
+        {
+            Logger::debug("AppInfo: empty");
+            return;
+        }
+
+        auto nfo = pCreateInfo->pApplicationInfo;
+        Logger::debug("AppInfo:");
+        Logger::debug(std::format("apiVersion: {:#x}", nfo->apiVersion ?: VK_API_VERSION_1_2));
+        Logger::debug(std::format("ApplicationName: {}", nfo->pApplicationName ?: ""));
+        Logger::debug(std::format("EngineName: {}", nfo->pEngineName ?: ""));
+    }
+
     class VkInstanceOverrides
     {
     public:
+        static auto CreateInstance(PFN_vkCreateInstance         pfnCreateInstanceProc,
+                                   const VkInstanceCreateInfo*  pCreateInfo,
+                                   const VkAllocationCallbacks* pAllocator,
+                                   VkInstance*                  pInstance)
+        {
+            Logger::trace("vkCreateInstance");
+            if (!pCreateInfo)
+            {
+                return pfnCreateInstanceProc(pCreateInfo, pAllocator, pInstance);
+            }
+
+            printAppInfo(pCreateInfo);
+
+            VkInstanceCreateInfo modifiedCreateInfo = *pCreateInfo;
+            VkApplicationInfo    appInfo            = getModifiedAppInfo(pCreateInfo);
+
+            modifiedCreateInfo.pApplicationInfo = &appInfo;
+
+            return pfnCreateInstanceProc(&modifiedCreateInfo, pAllocator, pInstance);
+        }
+
         static auto CreateDevice(const vkroots::VkInstanceDispatch* pDispatch,
                                  VkPhysicalDevice                   physicalDevice,
                                  const VkDeviceCreateInfo*          pCreateInfo,
@@ -114,7 +175,6 @@ namespace VulkanFX
                 Logger::debug("activating mutable_format");
                 addUniqueCString(enabledExtensionNames, "VK_KHR_swapchain_mutable_format");
             }
-            addUniqueCString(enabledExtensionNames, "VK_KHR_image_format_list");
 
             modifiedCreateInfo.ppEnabledExtensionNames = enabledExtensionNames.data();
             modifiedCreateInfo.enabledExtensionCount   = enabledExtensionNames.size();
