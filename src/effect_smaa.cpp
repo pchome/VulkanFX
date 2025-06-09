@@ -12,8 +12,8 @@
 #include "image.hpp"
 #include "util.hpp"
 
-#include "AreaTex.h"
-#include "SearchTex.h"
+#include "texture/AreaTex.h"
+#include "texture/SearchTex.h"
 #include "shader_sources.hpp"
 
 namespace VulkanFX

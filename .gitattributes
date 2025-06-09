@@ -1,8 +1,6 @@
-src/stb_image.h linguist-vendored
-src/stb_image_resize.h linguist-vendored
 src/stb_image_dds.h linguist-vendored
-src/AreaTex.h linguist-generated
-src/SearchTex.h linguist-generated
+src/texture/AreaTex.h linguist-generated
+src/texture/SearchTex.h linguist-generated
 
 src/reshade/* linguist-vendored
 
